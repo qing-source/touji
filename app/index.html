@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大师投机决策台 · 决策台</title>
+<link rel="stylesheet" href="style.css?v=6">
+<script src="data.js"></script>
+<style>
+.tabs{display:flex;gap:6px;margin-bottom:22px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:5px;width:fit-content}
+.tab{padding:8px 18px;border-radius:9px;cursor:pointer;background:transparent;font-size:13.5px;color:var(--sub);transition:.18s;border:none;font-family:var(--font)}
+.tab:hover{color:var(--txt)}
+.tab.active{background:var(--gold-dim);color:var(--gold2);font-weight:600;box-shadow:inset 0 0 0 1px rgba(216,168,69,.3)}
+.picklist{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:12px}
+.pick{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:12.5px;color:#c4cede}
+.pick b{color:var(--gold2)}
+</style>
+</head>
+<body>
+
+<nav class="navbar"><div class="nav-inner">
+  <div class="brand"><span class="mark">◈</span>大师投机决策台</div>
+  <div class="nav-links">
+    <a href="index.html" class="active">决策台</a>
+    <a href="sector.html">板块热度</a>
+    <a href="news.html">资讯雷达</a>
+    <a href="theory.html">真实思想</a>
+    <a href="skills.html">Skill 图解</a>
+    <a href="backtest.html">回测验证</a>
+    <a href="system.html">系统完善</a>
+  </div>
+</div></nav>
+
+<div class="hero"><div class="hero-inner">
+  <span class="eyebrow">Master Verdict · 大师分诊</span>
+  <h1>大师短线投机决策台</h1>
+  <p>同一组盘面事实，分别交给利弗莫尔（趋势·关键点·金字塔）、索罗斯（反身性·假设证伪）与道格拉斯（纪律层）三位大师的蒸馏 Skill 独立研判，再合成最终裁决与选股建议。</p>
+  <span class="badge">传统投机 · 多视角交叉验证 · 先生存再赚钱</span>
+</div></div>
+
+<div class="wrap">
+  <div class="tabs">
+    <div class="tab active" data-tab="diagnose">⚖️ 大师分诊研判</div>
+    <div class="tab" data-tab="market">🌡️ 市场温度计</div>
+    <div class="tab" data-tab="stock">🔍 选股筛选器</div>
+    <div class="tab" data-tab="checklist">✅ 60秒清单</div>
+    <div class="tab" data-tab="journal">📒 交易日志</div>
+    <div class="tab" data-tab="rules">🛡️ 风控铁律</div>
+    <div class="tab" data-tab="ashare">🇨🇳 A股制度速查</div>
+  </div>
+
+  <!-- ============ 市场温度计 ============ -->
+  <div id="tab-market" style="display:none">
+    <div class="card">
+      <h2>三大指数市场温度计<span class="k">真实日线数据 · SHA-256 防篡改校验 · 与回测页同源</span></h2>
+      <p class="small">基于内置真实日线数据计算：价格相对 MA20/MA200 的位置、近 60 日涨跌幅与最大回撤、距 20 日高点距离。温度反映"趋势强度 + 短期过热程度"，帮助判断当前处于利弗莫尔趋势段还是索罗斯衰竭段。</p>
+      <div class="stats" id="mkt-stats"></div>
+      <div class="box" style="margin-top:14px">
+        <h3>温度计读数指南</h3>
+        <ul>
+          <li><b>趋势温度 ≥ 60</b>：价格在 MA200 上方运行，利弗莫尔主策略可启用；<b>&lt; 40</b> 视为空头环境，趋势策略空仓。</li>
+          <li><b>过热温度 ≥ 75</b>：距 20 日高点过近 + 短线涨幅大，追高风险高，等待回踩 P2 买点。</li>
+          <li><b>回撤警示</b>：近 60 日最大回撤 &gt; 10% 时风控铁律强制减仓，&gt; 15% 空仓两周。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 大师分诊 ============ -->
+  <div id="tab-diagnose">
+    <div class="card">
+      <h2>① 选择市场<span class="k">同一份事实，三位大师各自研判</span></h2>
+      <div class="mkt-row">
+        <div class="mkt-btn active" data-mkt="A股">🇨🇳 A股（沪深）</div>
+        <div class="mkt-btn" data-mkt="港股">🇭🇰 港股（恒生）</div>
+        <div class="mkt-btn" data-mkt="美股">🇺🇸 美股（标普/纳指）</div>
+      </div>
+      <h2>② 回答盘面问题</h2>
+      <div class="note" style="margin-top:-6px">💡 <b>资讯 → 问题 速查：</b>「利好不涨/龙头滞涨」≈ Q5 ·「政策/资金持续加码」≈ Q7 反向 ·「板块多股大涨」≈ Q2 ·「放量突破前高」≈ Q3/Q4 ·「恐慌长阴」≈ Q8 · 详见<a href="news.html" style="color:var(--gold2)">资讯雷达</a>页。</div>
+      <div id="questions"></div>
+      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="diagnose()">⚖️ 启动大师分诊</button>
+        <button class="btn btn-ghost" onclick="resetQ()">重置</button>
+      </div>
+    </div>
+
+    <div class="card anim" id="result" style="display:none">
+      <h2>📋 大师分诊结果 · <span id="r-market"></span><span class="k" id="r-stamp"></span></h2>
+      <div class="masters" id="masters"></div>
+      <div class="verdict" id="r-verdict" style="margin-top:16px"></div>
+      <div class="grid2">
+        <div class="box" id="r-pos"><h3>综合仓位与操作</h3></div>
+        <div class="box" id="r-watch"><h3>需盯防的信号</h3></div>
+      </div>
+      <div class="box" style="margin-top:14px">
+        <h3>🎯 选股建议（按当前裁决匹配的模式）</h3>
+        <div class="picklist" id="r-picks"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 选股 ============ -->
+  <div id="tab-stock" style="display:none">
+    <div class="card">
+      <h2>短线选股筛选器<span class="k">按大师分诊给出的模式匹配</span></h2>
+      <p class="small">输入候选股特征，输出是否符合入场条件。</p>
+      <div class="controls" style="margin-top:14px">
+        <div style="flex:1;min-width:200px"><label>目标模式</label>
+          <select id="s-pattern" style="width:100%">
+            <option value="6">P6 龙头跟随（板块共振）</option>
+            <option value="1">P1 平台突破（最小阻力）</option>
+            <option value="2">P2 关键点回踩确认</option>
+            <option value="3">P3 反身性加速段</option>
+            <option value="5">P5 恐慌错杀反弹（辅助）</option>
+          </select></div>
+        <div><label>板块今日≥2只大涨/涨停？</label><select id="s-sector"><option value="1">是</option><option value="0">否</option></select></div>
+        <div><label>创20日新高且放量？</label><select id="s-breakout"><option value="1">是</option><option value="0">否</option></select></div>
+        <div><label>突破后缩量回踩不破关键点？</label><select id="s-pullback"><option value="1">是</option><option value="0">否/未发生</option></select></div>
+        <div><label>板块内最强（最先涨停/量最大）？</label><select id="s-leader"><option value="1">是</option><option value="0">否</option></select></div>
+        <div><label>估值/涨幅历史极值区？</label><select id="s-extreme"><option value="0">否</option><option value="1">是</option></select></div>
+        <div><label>大盘恐慌长阴次日缩量止跌？</label><select id="s-panic"><option value="0">否</option><option value="1">是</option></select></div>
+        <div><label>叙事升温+资金占比抬升？</label><select id="s-narrative"><option value="0">否</option><option value="1">是</option></select></div>
+      </div>
+      <button class="btn btn-primary" onclick="screenStock()">🔍 筛选评估</button>
+      <div class="result box" id="s-result" style="display:none;margin-top:14px"></div>
+    </div>
+  </div>
+
+  <!-- ============ 清单 ============ -->
+  <div id="tab-checklist" style="display:none">
+    <div class="card">
+      <h2>开仓前 60 秒清单<span class="k">任一不过 = 不许开仓</span></h2>
+      <div id="cl-items"></div>
+      <div class="verdict" id="cl-result" style="display:none"></div>
+      <button class="btn btn-primary" onclick="checkList()">✅ 核对结果</button>
+    </div>
+  </div>
+
+  <!-- ============ 日志 ============ -->
+  <div id="tab-journal" style="display:none">
+    <div class="card">
+      <h2>交易日志<span class="k">本机 localStorage 存储</span></h2>
+      <div class="controls" style="margin-bottom:12px">
+        <div><label>日期</label><input type="text" id="j-date" placeholder="2026-08-30"></div>
+        <div><label>标的</label><input type="text" id="j-symbol" placeholder="如 600519"></div>
+        <div><label>模式</label><select id="j-pattern"><option>P1</option><option>P2</option><option>P3</option><option>P4</option><option>P5</option><option>P6</option></select></div>
+        <div><label>市场状态</label><select id="j-state"><option>健康趋势</option><option>趋势无热点</option><option>趋势末段</option><option>衰竭/顶部</option><option>恐慌</option><option>恐慌企稳</option><option>弱势/不明</option></select></div>
+        <div style="flex:2;min-width:180px"><label>假设（一句话）</label><input type="text" id="j-thesis" style="width:100%" placeholder="板块共振龙头延续"></div>
+        <div><label>盈亏 %（离场后填）</label><input type="number" id="j-pnl" step="0.1"></div>
+        <div><label>遵守规则？</label><select id="j-obey"><option value="1">是</option><option value="0">否</option></select></div>
+        <div style="flex:2;min-width:160px"><label>教训一句话</label><input type="text" id="j-lesson" style="width:100%"></div>
+      </div>
+      <button class="btn btn-primary" onclick="addJournal()">＋ 添加记录</button>
+      <button class="btn btn-ghost" onclick="clearJournal()">清空全部</button>
+      <div id="j-stats" style="margin-top:16px"></div>
+      <div style="overflow-x:auto;margin-top:12px"><table id="j-table"></table></div>
+    </div>
+  </div>
+
+  <!-- ============ 风控 ============ -->
+  <div id="tab-rules" style="display:none">
+    <div class="card">
+      <h2>🛡️ 风控铁律<span class="k">优先级最高 · 违反一条 = 停交易一周</span></h2>
+      <div class="box"><ul>
+        <li>单笔风险 ≤ 账户 <b>2%</b>（按止损价计算）</li>
+        <li>总回撤 <b>10% → 仓位减半；15% → 强制空仓两周</b></li>
+        <li>同向总敞口 ≤ 75%；亏损头寸<b>绝不摊平</b>（利弗莫尔棉花案教训）</li>
+        <li><b>不加杠杆</b>做短线（两位大师破产的共同放大器）</li>
+        <li>连续 3 笔止损 → 强制休息 2 个交易日</li>
+        <li>不听消息、不问观点</li>
+        <li>赚大钱后 3 天内不开新仓；情绪不稳禁止开仓（道格拉斯纪律层）</li>
+      </ul></div>
+      <h3>破产先兆自查（出现 2 项 = 立即降仓 50%）</h3>
+      <div class="box"><ul>
+        <li>想借钱/加杠杆翻本</li><li>交易频率明显上升且多数不在 Playbook 内</li>
+        <li>出现"下一把扳回来"的念头</li><li>不敢打开账户看市值</li>
+        <li>隐瞒家人交易情况</li><li>睡眠受交易影响</li>
+      </ul></div>
+      <div class="quote">"他知道所有正确的规则，死于不执行。规则的价值 10% 在写下来，90% 在执行。"</div>
+    </div>
+  </div>
+
+  <!-- ============ A股制度速查 ============ -->
+  <div id="tab-ashare" style="display:none">
+    <div class="card">
+      <h2>🇨🇳 A股制度速查<span class="k">2024-2026 现行制度 · 投机规则落地前提</span></h2>
+      <p class="small">传统投机方法映射到 A股，必须先理解制度约束。以下是与短线投机最相关的现行规则（截至 2026 年，请以交易所最新公告为准）。</p>
+      <div class="grid2">
+        <div class="box">
+          <h3>交易制度</h3>
+          <ul>
+            <li><b>T+1 回转交易</b>：当日买入次日才可卖出 → 买入即锁定，止损只能在次日执行，仓位必须为"次日风险"留余地；</li>
+            <li><b>涨跌停限制</b>：主板 ±10%、创业板/科创板 ±20%（上市前5日无限制）、北交所 ±30% → 涨停买入=次日才能兑现，必须评估"隔夜溢价"；</li>
+            <li><b>交易时间</b>：9:15-9:25 集合竞价、9:30-11:30 / 13:00-15:00 连续竞价；14:57-15:00 收盘集合竞价；</li>
+            <li><b>最小单位</b>：100 股（1手）整数倍，科创板 200 股起；卖出可不足整手。</li>
+          </ul>
+        </div>
+        <div class="box">
+          <h3>费用与杠杆</h3>
+          <ul>
+            <li><b>印花税</b>：仅卖出收取 0.05%（2023年8月减半后）；</li>
+            <li><b>佣金</b>：约万 2.5-万 3，最低 5 元；过户费万 0.1；</li>
+            <li><b>融资融券</b>：开通需 50 万资产+6 个月经验；保证金比例≥100%；风控铁律：<b>短线不加杠杆</b>；</li>
+            <li><b>科创板/创业板准入</b>：50 万/10 万资产+2 年经验，新开户投资者无法立即参与。</li>
+          </ul>
+        </div>
+        <div class="box">
+          <h3>发行与交易机制（2023-2025 改革）</h3>
+          <ul>
+            <li><b>全面注册制</b>（2023-02-17 实施）：新股定价市场化、前5日无涨跌幅限制 → 打新不再稳赚，次新股波动加剧；</li>
+            <li><b>主板注册制新股</b>：上市首日无限制，次日起 ±10%；主板上市规则调整（市值/盈利门槛）；</li>
+            <li><b>程序化交易监管</b>（2024）：高频量化报备+异常交易监控 → 短线情绪被量化加剧，追板失败率上升；</li>
+            <li><b>交易单元与申报</b>：科创板市价申报保护限价，避免极端滑点。</li>
+          </ul>
+        </div>
+        <div class="box">
+          <h3>退市与风险警示</h3>
+          <ul>
+            <li><b>ST/*ST</b>：财务或违规风险警示，日涨跌幅 ±5%（主板）→ 流动性差、博弈激烈；</li>
+            <li><b>退市新规</b>（2020 修订）：市值退市、面值退市、财务类退市加速 → 垃圾股炒作风险陡增；</li>
+            <li><b>减持新规</b>：控股股东/实控人减持受限 → 次新股/小盘股减持压力需评估；</li>
+            <li><b>特别提示</b>：本 skill 所有模式<b>默认只做非 ST、流动性充足的正常标的</b>，ST 股不在 Playbook 内。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note"><b>制度对六模式的影响速记：</b>P1/P2（突破回踩）受 T+1 影响 → 次日确认再进；P3（加速）受涨跌停限制 → 一字板无法参与，等换手确认；P4（清仓）不受制度阻碍，随时可执行；P5（超跌反弹）注意跌停板无法卖出；P6（龙头）首选换手充分的真龙头，回避无量一字板。</div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ 免责声明：本工具是对利弗莫尔、索罗斯、道格拉斯等公开历史思想的规则化整理与教学演示，不构成投资建议。两位投机大师均多次破产/巨亏。请严格执行风控铁律，自行承担全部交易后果。
+  </div>
+</div>
+
+<script>
+/* ================= 数据 ================= */
+const MARKETS = {
+  "A股":  {index:"沪深300/上证指数", note:"T+1、涨跌停 → 龙头模式（P6）胜率历史最高；关键点位关注整数关口与前高"},
+  "港股": {index:"恒生指数/恒生科技", note:"无涨跌停、流动性分化 → 只做成交额前20%标的，止损收紧至-4%"},
+  "美股": {index:"标普500/纳指", note:"盘前盘后波动大、可做空 → P4 三条件确认后才考虑对冲"}
+};
+const QUESTIONS = [
+  {id:"above_ma",  q:"主要指数站在 20 日均线上方？", hint:"利弗莫尔：价格沿最小阻力线运动；站上20日线是趋势的初步证据"},
+  {id:"hot_sector",q:"存在持续热点板块（≥3日活跃、有龙头）？", hint:"利弗莫尔：板块运动是交易的基本单位"},
+  {id:"volume_up", q:"上涨日成交额较近期放大？", hint:"利弗莫尔：量是突破的确认；缩量上涨不可信"},
+  {id:"key_break", q:"指数/龙头刚突破重要关键位（前高/平台/整数关口）？", hint:"利弗莫尔关键点：突破后确认才进场"},
+  {id:"news_good_no_rise", q:"出现利好不涨 / 龙头滞涨 / 散户疯狂入场？", hint:"索罗斯：反身性反馈环衰竭信号"},
+  {id:"extreme",   q:"估值/涨幅处于历史极值区（成交占比/换手极值）？", hint:"索罗斯：正反馈环末端特征"},
+  {id:"tool_used_up",q:"政策/资金弹药明显耗尽（利率高位、增量资金枯竭）？", hint:"索罗斯1992：维持趋势的工具耗尽"},
+  {id:"panic_day", q:"近期出现恐慌性长阴（单日大跌且放量）？", hint:"负反馈接管；利弗莫尔反对接飞刀"},
+  {id:"panic_stabilize", q:"恐慌次日缩量止跌企稳？", hint:"超卖反弹的确认信号（P5辅助模式）"}
+];
+const PATTERNS = {
+  "1":{name:"P1 平台突破·最小阻力", desc:"创20日新高+放量突破平台，次日不回破开盘价进场；止损-5%或跌回平台。", src:"利弗莫尔"},
+  "2":{name:"P2 关键点回踩确认", desc:"突破关键点后缩量回踩企稳进场，盈亏比更优；止损=有效跌破关键点3%。", src:"利弗莫尔"},
+  "3":{name:"P3 反身性加速段", desc:"正反馈初段跟进；只做放量长阳后的初段，量增价滞即离场。", src:"索罗斯"},
+  "4":{name:"P4 泡沫拐点（清仓）", desc:"三条件齐备：极值+工具耗尽+负反馈事件 → 降仓≤20%。", src:"索罗斯1992"},
+  "5":{name:"P5 恐慌错杀反弹（辅助）", desc:"恐慌长阴次日缩量止跌，小仓买强趋势股；目标+8%即了结。", src:"超卖研究"},
+  "6":{name:"P6 龙头跟随", desc:"板块共振日选最强龙头（最先涨停/量最大）；龙头让位即离场。", src:"利弗莫尔板块论"}
+};
+const QUOTES = {
+  liv_trend:'"大钱不是靠买卖赚的，是靠等待赚的。"',
+  liv_wait:'"我从不与报价带争辩，也不追问市场为什么。价格就是答案。"',
+  liv_flat:'"横盘时不要交易——阻力均衡，方向未定。"',
+  sor_loop:'"趋势本身会创造趋势的理由——这就是反身性。"',
+  sor_wrong:'"我之所以富有，是因为我总知道自己会错。发现错误时我就改。"',
+  sor_top:'"当利好也无法推动价格，反馈环就已断裂。"',
+  disc:'"单笔交易的结果是随机的；长期纪律才产生期望值。"'
+};
+let currentMarket="A股";
+const answers={}; QUESTIONS.forEach(q=>answers[q.id]=false);
+
+/* ================= 渲染问题 ================= */
+function renderQuestions(){
+  document.getElementById("questions").innerHTML = QUESTIONS.map(q=>`
+    <div class="q">
+      <input type="checkbox" id="q-${q.id}" ${answers[q.id]?"checked":""} onchange="answers['${q.id}']=this.checked">
+      <label for="q-${q.id}">${q.q}<span class="hint">${q.hint}</span></label>
+    </div>`).join("");
+}
+function resetQ(){QUESTIONS.forEach(q=>answers[q.id]=false);renderQuestions();}
+document.querySelectorAll(".mkt-btn").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".mkt-btn").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); currentMarket=b.dataset.mkt;
+});
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");
+  ["diagnose","market","stock","checklist","journal","rules","ashare"].forEach(n=>
+    document.getElementById("tab-"+n).style.display = (n===t.dataset.tab)?"block":"none");
+  if(t.dataset.tab==="market") renderMarketTemp();
+});
+
+/* ================= 大师分诊引擎 ================= */
+function diagnose(){
+  const a=answers;
+  document.getElementById("r-market").textContent=currentMarket+" · "+MARKETS[currentMarket].index;
+  document.getElementById("r-stamp").textContent="生成于 "+new Date().toLocaleString("zh-CN");
+
+  /* ---- 利弗莫尔视角（趋势+关键点+时间要素） ---- */
+  let liv={chip:"",state:"",pos:0,pats:[],quote:"",pick:[]};
+  const livTrend=a.above_ma&&a.volume_up;
+  if(!a.above_ma){
+    liv={chip:"chip-down",state:"空仓观察（价格在20日线下方，最小阻力向下）",pos:15,pats:[],quote:QUOTES.liv_wait,
+      pick:["暂停开新仓；等待指数收复20日线","若个别板块独立走强且大盘止跌，仅允许≤15%试仓"]};
+  } else if(livTrend&&a.key_break&&a.hot_sector){
+    liv={chip:"chip-up",state:"趋势确认 + 关键点突破 → 积极做多窗口",pos:75,pats:["6","1","2"],quote:QUOTES.liv_trend,
+      pick:["板块共振日的最强龙头（P6）","刚突破前高/平台且放量的强趋势股（P1）","突破后缩量回踩关键点的候选（P2）"]};
+  } else if(livTrend&&a.hot_sector){
+    liv={chip:"chip-up",state:"健康趋势但关键点尚未确认 → 轻仓跟随",pos:50,pats:["6","2"],quote:QUOTES.liv_flat,
+      pick:["等待龙头回踩不破关键点的机会（P2）","或板块共振日的最强龙头（P6）"]};
+  } else if(livTrend){
+    liv={chip:"chip-flat",state:"指数上行但无热点 → 只做指数节奏",pos:30,pats:["1","2"],quote:QUOTES.liv_flat,
+      pick:["创20日新高且放量的强趋势股（P1）","新高后回踩确认的个股（P2）"]};
+  } else {
+    liv={chip:"chip-flat",state:"横盘/方向未明 → 等待关键点",pos:20,pats:[],quote:QUOTES.liv_flat,
+      pick:["横盘区不交易；等放量突破关键点后再评估"]};
+  }
+  if(a.panic_day){liv.pos=Math.min(liv.pos,10);liv.pick=["恐慌期利弗莫尔反对接飞刀——空仓等企稳信号"];}
+
+  /* ---- 索罗斯视角（反身性+谬误性） ---- */
+  let sor={chip:"",state:"",pos:0,pats:[],quote:"",pick:[]};
+  const sorTop=a.news_good_no_rise&&a.extreme&&a.tool_used_up;
+  const sorExhaust=(a.news_good_no_rise||a.extreme);
+  if(sorTop){
+    sor={chip:"chip-risk",state:"反身性反馈环断裂 → 系统性减仓（三条件齐备）",pos:20,pats:["4"],quote:QUOTES.sor_top,
+      pick:["清仓优先，不留恋任何持仓","仅保留最强逻辑的防御仓位≤20%","若市场再创新高=判断错误，承认并恢复规则"]};
+  } else if(sorExhaust){
+    sor={chip:"chip-down",state:"反馈环进入衰竭段 → 只减不加",pos:40,pats:["2","4"],quote:QUOTES.sor_wrong,
+      pick:["只允许低位补涨逻辑的P2回踩","禁止追高P3加速段","盯防：量增价滞/龙头补跌/利好不涨"]};
+  } else if(a.panic_day){
+    sor={chip:"chip-down",state:"负反馈接管 → 空仓等待负反馈衰竭",pos:0,pats:[],quote:QUOTES.sor_wrong,
+      pick:["空仓。恐慌下跌中反身性向下自我强化","等恐慌次日缩量止跌后，才评估P5小仓"]};
+  } else if(a.volume_up&&a.hot_sector){
+    sor={chip:"chip-up",state:"正反馈健康运转 → 顺势持有但设证伪条件",pos:60,pats:["3","6"],quote:QUOTES.sor_loop,
+      pick:["反身性加速初段的强势股（P3初段）","叙事升温+资金抬升的板块龙头","每次持仓写下一句话假设+证伪条件"]};
+  } else {
+    sor={chip:"chip-flat",state:"反馈环中性 → 小仓试探",pos:25,pats:["3"],quote:QUOTES.sor_loop,
+      pick:["等正反馈证据（放量+热点）出现再提升仓位"]};
+  }
+
+  /* ---- 道格拉斯纪律层（心理校验，不改变仓位，只加约束） ---- */
+  const disc=QUOTES.disc;
+  const discNote="单笔交易随机、长期纪律出期望值——本月规则遵守率<90%时，无论信号多好都降低一档仓位执行。";
+  const discChip=(liv.pos<=20||sor.pos<=20)?"chip-flat":"chip-up";
+  const discTxt=(liv.pos<=20||sor.pos<=20)?"收紧档执行":"正常档执行";
+
+  /* ---- 综合裁决 ---- */
+  let verdict,cls,posCap,watch=[];
+  const score=(liv.pos>50?1:0)+(sor.pos>50?1:0);
+  if(sorTop||(!a.above_ma&&a.panic_day)){
+    verdict="🔴 综合裁决：规避（索罗斯三条件/恐慌负反馈 → 降低风险敞口）"; cls="v-red";
+    posCap=Math.min(liv.pos,sor.pos,20);
+    watch=["反馈环断裂后任何反弹都是逃命波，不参与","恐慌中不接飞刀；等缩量企稳次日信号","防系统性风险：不加杠杆、不抄底摊平"];
+  } else if(score>=2){
+    verdict="🟢 综合裁决：积极（利弗莫尔趋势确认 ∧ 索罗斯正反馈健康）"; cls="v-green";
+    posCap=Math.max(liv.pos,sor.pos)*0.9|0;
+    watch=["利弗莫尔：龙头是否让位、关键点是否守住","索罗斯：量增价滞/利好不涨=衰竭前兆","一旦任一大师信号转弱，按对应模式退出"];
+  } else if(score===1){
+    verdict="🟡 综合裁决：中性偏谨慎（两位大师信号分歧）"; cls="v-amber";
+    posCap=Math.min(liv.pos,sor.pos);
+    watch=["分歧期用最小仓位试探，等信号收敛","利弗莫尔看趋势、索罗斯看衰竭——先满足较保守者","设好证伪条件：出现任一衰竭信号即离场"];
+  } else {
+    verdict="🟠 综合裁决：观望（趋势未确认且反身性未启动）"; cls="v-amber";
+    posCap=Math.max(liv.pos,sor.pos)*0.5|0;
+    watch=["空仓等待也是仓位（利弗莫尔：大钱靠等待）","盯防：放量突破关键点（利弗莫尔信号）或利好不涨（索罗斯信号）"];
+  }
+
+  /* ---- 渲染 ---- */
+  const mh=(key,title,src,chipTxt,chipCls,body)=>
+    `<div class="master ${key}"><div class="mhead"><div>
+       <div class="mname">${title}</div><div class="msrc">${src}</div></div>
+       <span class="chip ${chipCls}" style="margin-left:auto">${chipTxt}</span></div>
+     <div class="mbody">${body}</div></div>`;
+  document.getElementById("masters").innerHTML=
+    mh("livermore","杰西·利弗莫尔","趋势 · 关键点 · 金字塔", liv.state.split("→")[0], liv.chip,
+      `<div class="row"><span class="lbl">研判</span><span>${liv.state}</span></div>
+       <div class="row"><span class="lbl">仓位</span><span>建议总仓位 ≤ <b>${liv.pos}%</b></span></div>
+       <div class="row"><span class="lbl">模式</span><span>${liv.pats.length?liv.pats.map(p=>`<span class="tag t-gold">${PATTERNS[p].name}</span>`).join(""):"无 — 等待"}</span></div>
+       <div class="quote">${liv.quote} —— 利弗莫尔</div>`);
+  document.getElementById("masters").innerHTML+=
+    mh("soros","乔治·索罗斯","反身性 · 谬误性 · 假设证伪", sor.state.split("→")[0], sor.chip,
+      `<div class="row"><span class="lbl">研判</span><span>${sor.state}</span></div>
+       <div class="row"><span class="lbl">仓位</span><span>建议总仓位 ≤ <b>${sor.pos}%</b></span></div>
+       <div class="row"><span class="lbl">模式</span><span>${sor.pats.length?sor.pats.map(p=>`<span class="tag t-blue">${PATTERNS[p].name}</span>`).join(""):"无 — 等待"}</span></div>
+       <div class="quote">${sor.quote} —— 索罗斯</div>`);
+  document.getElementById("masters").innerHTML+=
+    mh("discipline","马克·道格拉斯","交易心理 · 纪律层",discTxt, discChip,
+      `<div class="row"><span class="lbl">校验</span><span>${discNote}</span></div>
+       <div class="row"><span class="lbl">前提</span><span>本月规则遵守率 &gt; 90% 才可按上述仓位满格执行</span></div>
+       <div class="row"><span class="lbl">禁则</span><span>连亏3笔休市2天；赚大钱后3天不开新仓</span></div>
+       <div class="quote">${disc} —— 道格拉斯</div>`);
+
+  const v=document.getElementById("r-verdict");
+  v.className="verdict "+cls;
+  v.innerHTML=`<b>${verdict}</b><br>建议总仓位上限：<b>${posCap}%</b>　|　${MARKETS[currentMarket].note}`;
+
+  document.getElementById("r-pos").innerHTML=`<h3>综合仓位与操作</h3><ul>
+    <li>总仓位上限 <b>${posCap}%</b>（三位大师意见交叉后的保守值）</li>
+    <li>首笔试仓 ≤ 总仓位的 1/3，浮盈验证后才金字塔加仓（利弗莫尔向上加仓）</li>
+    <li>单笔风险 = 仓位 × 止损距离 ≤ 账户 <b>2%</b></li>
+    <li>每笔持仓必须写下<b>一句话假设 + 证伪条件</b>（索罗斯假设-证伪法）</li></ul>`;
+  document.getElementById("r-watch").innerHTML=`<h3>需盯防的信号</h3><ul>${watch.map(s=>`<li>${s}</li>`).join("")}</ul>`;
+
+  const picks=[...new Set([...liv.pick,...sor.pick])];
+  document.getElementById("r-picks").innerHTML=picks.map(p=>`<div class="pick">${p}</div>`).join("");
+
+  const res=document.getElementById("result");
+  res.style.display="block";res.scrollIntoView({behavior:"smooth"});
+}
+
+/* ================= 选股筛选 ================= */
+function screenStock(){
+  const g=id=>document.getElementById(id).value==="1";
+  const p=document.getElementById("s-pattern").value;
+  const checks={
+    "6":[["s_sector","板块≥2只大涨/涨停（共振日）"],["s_leader","候选股是板块最强龙头"]],
+    "1":[["s_breakout","创20日新高且放量突破"]],
+    "2":[["s_breakout","先有突破（创20日新高）"],["s_pullback","回踩缩量不破关键点"]],
+    "3":[["s_narrative","叙事升温+资金占比抬升"],["s_breakout","价格创新高（正反馈未断）"],["s_extreme","尚未到历史极值区（否则只算P4候选）",true]],
+    "5":[["s_panic","大盘恐慌长阴次日缩量止跌"],["s_breakout","此前本处于强趋势（20日新高特征）",true]]
+  };
+  let pass=true,rows="";
+  checks[p].forEach(([k,label,invert])=>{
+    const ok=invert? !g(k) : g(k);
+    if(!ok) pass=false;
+    rows+=`<li>${ok?"✅":"❌"} ${label}</li>`;
+  });
+  let extra="";
+  if(p==="3"&&g("s_extreme")) extra="<p class='small' style='color:var(--red)'>⚠️ 已处极值区：这不再是P3做多候选，转向P4盯防清单。</p>";
+  if(p==="6"&&!g("s_sector")) extra="<p class='small'>没有板块共振的涨停多为独狼行情，持续性差，放弃。</p>";
+  const html=`<h3>${PATTERNS[p].name} · ${pass?'<span class="tag t-green">符合入场条件</span>':'<span class="tag t-red">不符合 · 不开仓</span>'}</h3>
+    <ul>${rows}</ul>${extra}
+    <p class="small">若通过：按模式默认规则设止损 → 单笔风险≤2%定仓位 → 填写60秒清单 → 记入交易日志。</p>`;
+  const box=document.getElementById("s-result");
+  box.style.display="block"; box.innerHTML=html;
+}
+
+/* ================= 清单 ================= */
+const CL=["我用的是 Playbook 中哪个编号的模式？（答不出=不开仓）",
+  "我的假设一句话是什么？什么情况证明假设错误？",
+  "止损位在哪？亏损金额占账户≤2%？",
+  "这是计划中的交易，还是盘中冲动？",
+  "今天已止损笔数 <2 笔？",
+  "仓位符合金字塔规则（首仓≤总仓1/3，无亏损加仓）？",
+  "当前总敞口未超大师分诊给出的仓位上限？"];
+function renderCL(){
+  document.getElementById("cl-items").innerHTML=CL.map((c,i)=>`
+    <div class="q"><input type="checkbox" id="cl-${i}"><label for="cl-${i}">${c}</label></div>`).join("");
+}
+function checkList(){
+  const n=CL.map((_,i)=>document.getElementById("cl-"+i).checked).filter(Boolean).length;
+  const r=document.getElementById("cl-result"); r.style.display="block";
+  if(n===CL.length){r.className="verdict v-green";r.innerHTML=`<b>✅ 7/7 全部通过 —— 可以开仓。</b><br>下单即设止损，进场后立即写入交易日志。`;}
+  else{r.className="verdict v-red";r.innerHTML=`<b>⛔ ${n}/${CL.length} —— 未全部通过，禁止开仓。</b><br>清单的意义就是把冲动挡在下单之前。`;}
+}
+
+/* ================= 日志 ================= */
+const JK="skill_journal_v1";
+function loadJ(){try{return JSON.parse(localStorage.getItem(JK))||[]}catch(e){return[]}}
+function saveJ(d){localStorage.setItem(JK,JSON.stringify(d))}
+function addJournal(){
+  const d={date:jv("j-date"),symbol:jv("j-symbol"),pattern:jv("j-pattern"),thesis:jv("j-thesis"),state:jv("j-state"),
+    pnl:parseFloat(jv("j-pnl"))||null,obey:jv("j-obey")==="1",lesson:jv("j-lesson")};
+  if(!d.symbol){alert("请至少填写标的");return}
+  const data=loadJ(); data.unshift(d); saveJ(data); renderJ();
+  ["j-date","j-symbol","j-thesis","j-pnl","j-lesson"].forEach(i=>document.getElementById(i).value="");
+}
+function jv(id){return document.getElementById(id).value.trim()}
+function delJ(i){const d=loadJ();d.splice(i,1);saveJ(d);renderJ()}
+function clearJournal(){if(confirm("确认清空全部交易日志？")){saveJ([]);renderJ()}}
+function renderJ(){
+  const d=loadJ(), t=document.getElementById("j-table");
+  const closed=d.filter(x=>x.pnl!==null);
+  const wins=closed.filter(x=>x.pnl>0);
+  const avgW=wins.length?wins.reduce((s,x)=>s+x.pnl,0)/wins.length:0;
+  const losses=closed.filter(x=>x.pnl<=0);
+  const avgL=losses.length?Math.abs(losses.reduce((s,x)=>s+x.pnl,0)/losses.length):0;
+  const wr=closed.length?100*wins.length/closed.length:0;
+  const exp=closed.length?(wr/100*avgW-(1-wr/100)*avgL):0;
+  const obeyRate=d.length?100*d.filter(x=>x.obey).length/d.length:0;
+  document.getElementById("j-stats").innerHTML=`<div class="stats">
+    <div class="stat"><div class="v">${closed.length}</div><div class="l">已平仓笔数</div></div>
+    <div class="stat"><div class="v">${wr.toFixed(0)}%</div><div class="l">胜率</div></div>
+    <div class="stat"><div class="v">${avgW.toFixed(1)}% / ${avgL.toFixed(1)}%</div><div class="l">均盈 / 均亏</div></div>
+    <div class="stat"><div class="v" style="color:${exp>0?'var(--green)':'var(--red)'}">${exp.toFixed(2)}%</div><div class="l">每笔期望值</div></div>
+    <div class="stat"><div class="v" style="color:${obeyRate>=90?'var(--green)':'var(--amber)'}">${obeyRate.toFixed(0)}%</div><div class="l">规则遵守率</div></div>
+    <div class="stat"><div class="v">${d.filter(x=>x.obey&&x.pnl!==null&&x.pnl<=0).length}</div><div class="l">守规亏损="成功"</div></div></div>`;
+  t.innerHTML="<tr><th>日期</th><th>标的</th><th>模式</th><th>状态</th><th>假设</th><th>盈亏%</th><th>守规</th><th>教训</th><th></th></tr>"+
+    d.map((x,i)=>`<tr><td>${x.date}</td><td>${x.symbol}</td><td>${x.pattern}</td><td class="small">${x.state||"—"}</td><td>${x.thesis}</td>
+      <td class="${x.pnl===null?'small':x.pnl>0?'green':'red'}">${x.pnl===null?"持仓中":x.pnl}</td>
+      <td>${x.obey?"✅":"❌"}</td><td>${x.lesson}</td><td><button class="btn btn-ghost btn-sm" onclick="delJ(${i})">删</button></td></tr>`).join("");
+}
+
+renderQuestions(); renderCL(); renderJ();
+
+/* ================= 市场温度计（真实数据） ================= */
+const MKT_META = {
+  shc: {name:"🇨🇳 上证综指", desc:"沪深 A股 整体温度（大盘权重）"},
+  hsi: {name:"🇭🇰 恒生指数", desc:"港股整体温度"},
+  spx: {name:"🇺🇸 标普500", desc:"美股整体温度"}
+};
+
+function parseCSV(csv){
+  return csv.trim().split("\n").slice(1).map(l=>{
+    const p=l.split(",");
+    return {date:p[0], o:+p[1], h:+p[2], l:+p[3], c:+p[4], v:+p[5]||0};
+  });
+}
+function sma(arr,n){const s=arr.slice(-n);return s.reduce((a,b)=>a+b,0)/s.length;}
+
+function renderMarketTemp(){
+  const box=document.getElementById("mkt-stats");
+  if(!box) return;
+  if(typeof DATASET==="undefined"){ box.innerHTML='<div class="note">数据未加载（data.js 缺失）。请确认文件与 index.html 同目录。</div>'; return; }
+  let html="";
+  for(const [key,m] of Object.entries(MKT_META)){
+    const s=DATASET.series[key];
+    if(!s){ html+=`<div class="note">${m.name}：无数据</div>`; continue; }
+    const rows=parseCSV(s.csv);
+    const last=rows[rows.length-1];
+    const closes=rows.map(r=>r.c);
+    const ma20=sma(closes,20), ma200=sma(closes,200);
+    const d20=(last.c/ma20-1)*100, d200=(last.c/ma200-1)*100;
+    const win=closes.slice(-60);
+    const hi60=Math.max(...win), lo60=Math.min(...win);
+    const ret60=(last.c/win[0]-1)*100;
+    const dd60=Math.min(...win.map(v=>v/Math.max(...win.slice(0,win.indexOf(v)+1))-1))*100;
+    // 温度合成：趋势温度（MA200上方加分）+ 短线位置（接近60日高=过热）
+    const trendT=Math.round(50 + d200*6 + (last.c>ma20?10:-10));
+    const heatT=Math.round(100*(1-(hi60-last.c)/(hi60-lo60||1)));
+    const overT=Math.round(Math.max(0,Math.min(100, trendT*0.6+heatT*0.4)));
+    const zone = overT>=75?"过热区（追高风险）":overT>=60?"强势区（顺势为主）":overT>=40?"中性区（等待确认）":"弱势区（趋势空仓）";
+    const zColor = overT>=75?"var(--red)":overT>=60?"var(--gold2)":overT>=40?"var(--blue)":"var(--sub)";
+    const lastDate=last.date;
+    // 近60日收盘 sparkline
+    const win60 = closes.slice(-60);
+    const wMin = Math.min(...win60), wMax = Math.max(...win60), wR = (wMax-wMin)||1;
+    const yAt = v => 58 - (v-wMin)/wR*50;
+    const ma20s = sma(closes,20), ma200s = sma(closes,200);
+    const sparkPath = win60.map((v,i)=>`${i?'L':'M'}${(i/(win60.length-1))*218},${yAt(v)}`).join('');
+    const sparkColor = ret60>=0?"#3ecf8e":"#ef6a60";
+    html+=`<div class="box" style="margin-top:12px">
+      <h3>${m.name} <span class="small">${m.desc} · 截至 ${lastDate}</span></h3>
+      <div class="stats">
+        <div class="stat"><div class="v">${last.c.toFixed(2)}</div><div class="l">最新收盘</div></div>
+        <div class="stat"><div class="v ${d20>=0?'green':'red'}">${d20>=0?'+':''}${d20.toFixed(2)}%</div><div class="l">距 MA20</div></div>
+        <div class="stat"><div class="v ${d200>=0?'green':'red'}">${d200>=0?'+':''}${d200.toFixed(2)}%</div><div class="l">距 MA200</div></div>
+        <div class="stat"><div class="v ${ret60>=0?'green':'red'}">${ret60>=0?'+':''}${ret60.toFixed(1)}%</div><div class="l">近60日涨跌</div></div>
+        <div class="stat"><div class="v" style="color:var(--red)">${dd60.toFixed(1)}%</div><div class="l">近60日最大回撤</div></div>
+        <div class="stat"><div class="v" style="color:${zColor}">${overT}</div><div class="l">综合温度</div></div>
+      </div>
+      <div style="display:flex;gap:26px;margin-top:14px;flex-wrap:wrap;align-items:center">
+        <svg width="150" height="100" viewBox="0 0 150 100">
+          <defs><linearGradient id="gg-${key}" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#3ecf8e"/><stop offset=".55" stop-color="#f0b429"/><stop offset="1" stop-color="#ef6a60"/>
+          </linearGradient></defs>
+          <path d="M 15 88 A 60 60 0 0 1 135 88" fill="none" stroke="#1f2736" stroke-width="13" stroke-linecap="round"/>
+          <path d="M 15 88 A 60 60 0 0 1 135 88" fill="none" stroke="url(#gg-${key})" stroke-width="13" stroke-linecap="round"
+            stroke-dasharray="${(overT/100)*188.5} 188.5"/>
+          <text x="75" y="64" text-anchor="middle" font-size="32" font-weight="750" fill="#fff">${overT}</text>
+          <text x="75" y="82" text-anchor="middle" font-size="10" fill="#64728a">综合温度</text>
+        </svg>
+        <div style="flex:1;min-width:240px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub)"><span>0 冰点</span><span>50 中性</span><span>100 过热</span></div>
+          <div style="height:12px;border-radius:8px;background:linear-gradient(90deg,#3ecf8e,#f0b429,#ef6a60);margin-top:4px;position:relative">
+            <div style="position:absolute;left:${overT}%;top:-3px;width:4px;height:18px;background:#fff;border-radius:2px;box-shadow:0 0 6px rgba(0,0,0,.6);transform:translateX(-50%)"></div>
+          </div>
+          <div style="margin-top:8px;font-size:12.5px"><b style="color:${zColor}">${zone}</b>　MA20 ${last.c>ma20?'上方 ▲':'下方 ▼'} · MA200 ${last.c>ma200?'上方 ▲':'下方 ▼'}</div>
+          <div class="small" style="margin-top:4px">温度 = 0.6×趋势分（MA200 位置与方向）+ 0.4×短线热度（60 日高低位）</div>
+        </div>
+        <svg width="220" height="64" viewBox="0 0 220 64">
+          <path d="${sparkPath}" fill="none" stroke="${sparkColor}" stroke-width="1.6"/>
+          <line x1="0" y1="${yAt(ma20s)}" x2="220" y2="${yAt(ma20s)}" stroke="#e5c07b" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/>
+          <line x1="0" y1="${yAt(ma200s)}" x2="220" y2="${yAt(ma200s)}" stroke="#a78bfa" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/>
+          <text x="2" y="10" font-size="9" fill="#64728a">近60日收盘（金=MA20 紫=MA200）</text>
+        </svg>
+      </div>
+    </div>`;
+  }
+  box.innerHTML=html;
+}
+</script>
+</body>
+</html>

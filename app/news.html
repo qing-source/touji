@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>资讯雷达 · 投资资讯部署</title>
+<link rel="stylesheet" href="style.css?v=6">
+<style>
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.info-card{background:linear-gradient(180deg,#141a28,#0f1420);border:1px solid var(--line);border-radius:13px;padding:16px}
+.info-card h3{color:var(--gold2);font-size:14px;margin:0 0 8px}
+.info-card ul{padding-left:18px;font-size:12.5px;color:#c4cede;line-height:1.8}
+.info-card li b{color:var(--txt)}
+.flow-v{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.flow-step{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12.5px}
+.flow-step .fn{width:22px;height:22px;border-radius:50%;background:var(--gold-dim);color:var(--gold2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0}
+.flow-step .fc{color:#c4cede}.flow-step .fc b{color:var(--txt)}
+.tier{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px dashed rgba(42,53,71,.5);font-size:13px}
+.tier:last-child{border-bottom:none}
+.tier .tl{font-weight:700;min-width:96px}
+.tier .td{color:#c4cede}
+.tl-a{color:var(--green)}.tl-b{color:var(--gold2)}.tl-c{color:var(--amber)}.tl-d{color:var(--red)}
+.checkline{display:flex;gap:10px;align-items:flex-start;padding:10px 4px;border-bottom:1px dashed rgba(42,53,71,.45);font-size:13px}
+.checkline:last-child{border-bottom:none}
+.checkline .ck{font-size:15px;flex-shrink:0}
+.mode-tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;border:1px solid;margin-right:6px}
+.mt-news{color:var(--blue);border-color:rgba(108,178,255,.4)}
+.mt-policy{color:var(--gold2);border-color:rgba(216,168,69,.4)}
+.mt-flow{color:var(--green);border-color:rgba(62,207,142,.4)}
+.mt-risk{color:var(--red);border-color:rgba(239,106,96,.4)}
+.flowcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px;font-size:13px;color:#c4cede}
+.flowcard b{color:var(--gold2)}
+.amber{color:var(--amber)}
+table.tbl td,table.tbl th{text-align:center}
+.link-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.link-tabs .mkt-btn{padding:7px 14px;font-size:12.5px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:#c4cede;cursor:pointer}
+.link-tabs .mkt-btn.on{background:var(--gold-dim);color:var(--gold2);border-color:rgba(216,168,69,.55);font-weight:700}
+.link-chain{display:flex;flex-direction:column;gap:7px;margin-top:6px}
+.lc-step{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--line);border-radius:10px;padding:9px 12px;font-size:12.5px;transition:all .18s}
+.lc-step .lc-tag{min-width:64px;text-align:center;font-weight:800;font-size:11px;padding:3px 0;border-radius:6px;flex-shrink:0}
+.lc-tag.lc-m{color:var(--gold2);background:rgba(216,168,69,.12)}
+.lc-tag.lc-p{color:var(--blue);background:rgba(108,178,255,.12)}
+.lc-tag.lc-b{color:var(--green);background:rgba(62,207,142,.12)}
+.lc-tag.lc-s{color:var(--amber);background:rgba(240,173,78,.12)}
+.lc-step .lc-body{color:#c4cede;line-height:1.7}
+.lc-step .lc-body b{color:var(--txt)}
+.lc-step .lc-master{color:var(--gold-dim);font-style:italic}
+.lc-step.hit{border-left-color:var(--gold2);background:linear-gradient(180deg,#171e2e,#111624)}
+.lc-arrow{align-self:center;color:#3a4a63;font-size:15px;padding-left:74px;line-height:1}
+.tm-row{display:flex;align-items:center;gap:12px;padding:7px 2px;border-bottom:1px dashed rgba(42,53,71,.4);font-size:12.5px}
+.tm-row:last-child{border-bottom:none}
+.tm-name{min-width:250px;color:#c4cede}
+.tm-name b{color:var(--txt)}
+.tm-slider{flex:1;accent-color:var(--gold2);height:4px;cursor:pointer}
+.tm-val{min-width:30px;text-align:right;color:var(--gold2);font-weight:700}
+.temp-gauge{width:86px;height:86px;border-radius:50%;border:3px solid var(--gold2);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:var(--gold2);flex-shrink:0;background:radial-gradient(circle at 30% 30%,#1a2233,#0e1320)}
+.temp-bar{height:10px;border-radius:6px;background:linear-gradient(90deg,#3aa0ff,#52d38a,#ffd166,#ff9f43,#ef6a60);overflow:hidden;position:relative}
+#tempFill{height:100%;background:rgba(255,255,255,.28);border-radius:6px}
+.temp-scale{display:flex;justify-content:space-between;font-size:10px;color:#5b6a85;margin-top:3px}
+.temp-zone{margin-top:7px;font-size:13px;font-weight:700;color:var(--txt)}
+.temp-zone.zone-cold{color:#5aa7ff}.temp-zone.zone-mild{color:#52d38a}.temp-zone.zone-warm{color:#ffd166}.temp-zone.zone-hot{color:#ef6a60}
+.jr-inp{background:#0d1220;border:1px solid var(--line);border-radius:7px;padding:7px 10px;color:var(--txt);font-size:12.5px;font-family:inherit}
+.jr-inp:focus{outline:none;border-color:rgba(216,168,69,.55)}
+textarea.jr-inp{resize:vertical;min-height:38px}
+.jr-entry{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12.5px;color:#c4cede}
+.jr-entry .jr-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.jr-entry .jr-h b{color:var(--gold2)}
+.jr-entry .jr-x{color:#5b6a85;cursor:pointer;border:none;background:none;font-size:13px;padding:0 4px}
+.jr-entry .jr-x:hover{color:var(--red)}
+</style>
+</head>
+<body>
+
+<nav class="navbar"><div class="nav-inner">
+  <div class="brand"><span class="mark">◈</span>大师投机决策台</div>
+  <div class="nav-links">
+    <a href="index.html">决策台</a>
+    <a href="sector.html">板块热度</a>
+    <a href="news.html" class="active">资讯雷达</a>
+    <a href="theory.html">真实思想</a>
+    <a href="skills.html">Skill 图解</a>
+    <a href="backtest.html">回测验证</a>
+    <a href="system.html">系统完善</a>
+  </div>
+</div></nav>
+
+<div class="hero"><div class="hero-inner">
+  <span class="eyebrow">News Radar · 资讯部署</span>
+  <h1>投资资讯部署 · 信息流 → 交易决策</h1>
+  <p>把"看资讯"从被动刷屏升级为主动的<b>信息作战</b>：信息源分级 → 宏观-政策-板块-个股四层信息流 → 资讯核验 → 与大师思想对接 → 盘前标准化流程。让每一条新闻都成为可执行的决策输入，而不是情绪噪声。</p>
+  <span class="badge">信息源分级 · 四层信息流 · 核验清单 · 盘前 SOP · 情绪利用</span>
+</div></div>
+
+<div class="wrap">
+
+  <div class="card">
+    <h2>一、信息源分级（可信度 × 时效 × 可执行性）<span class="k">先建好水源，再谈取水</span></h2>
+    <div class="tier"><span class="tl tl-a">A级 · 一手权威</span><span class="td"><b>交易所/证监会/央行/统计局官网</b>、上市公司<b>公告原文</b>（巨潮资讯网）、国家部委文件——信息本体，无转述损耗；政策市的核心驱动信号。</span></div>
+    <div class="tier"><span class="tl tl-b">B级 · 专业转述</span><span class="td"><b>权威财经媒体</b>（新华社、财新、证券时报）、券商研报（正规持牌机构）、Wind/东财 Choice 数据终端——已核实但带解读倾向，取其事实弃其观点。</span></div>
+    <div class="tier"><span class="tl tl-c">C级 · 平台聚合</span><span class="td">同花顺/东方财富/雪球/微博大V——<b>情绪与叙事的风向标</b>（散户疯狂程度、叙事传播速度），但鱼龙混杂，只能当"反身性观测样本"，绝不能当决策依据。</span></div>
+    <div class="tier"><span class="tl tl-d">D级 · 噪音黑名单</span><span class="td">荐股群、带单直播、收费内幕、"稳赚不赔"——<b>直接拉黑</b>；利弗莫尔死于听信他人消息，索罗斯也从不靠内幕。</span></div>
+    <div class="note"><b>分级原则：</b>决策只用 A/B 级事实；C 级只用来测量"市场情绪温度"（对应索罗斯反身性——当 C 级叙事疯狂而 A 级事实不涨，就是衰竭信号）；D 级一律屏蔽。这条分级本身就是风控。</div>
+  </div>
+
+  <div class="card">
+    <h2>二、四层信息流：宏观 → 政策 → 板块 → 个股<span class="k">自上而下的漏斗</span></h2>
+    <p class="small">把资讯按影响层级排列，先定大方向再定小目标——与大师分诊的"先判市场、再选模式、后挑个股"完全同构。</p>
+    <div class="info-grid">
+      <div class="info-card"><h3>🌐 宏观层（决定仓位）</h3><ul>
+        <li><b>利率/流动性</b>：LPR、MLF、央行公开市场操作、社融与 M2——流动性是 A股的总闸门，放水期 P3 加速段概率高；</li>
+        <li><b>经济数据</b>：PMI、CPI/PPI、进出口、工业增加值——确认"基本面向哪个方向"；</li>
+        <li><b>汇率与外围</b>：人民币汇率、美股/美债、地缘事件——影响北向资金与风险偏好；</li>
+        <li><b>对接大师</b>：宏观转弱时利弗莫尔"时间要素"要求降仓等待，宏观与政策共振向上才谈得上趋势。</li>
+      </ul></div>
+      <div class="info-card"><h3>🏛️ 政策层（A股特色核心）</h3><ul>
+        <li><b>制度政策</b>：注册制、退市新规、减持新规、印花税、交易监管（量化/转融通）——改变游戏规则；</li>
+        <li><b>产业政策</b>：新能源、半导体、AI、机器人等产业扶持文件——直接催生板块叙事（反身性起点）；</li>
+        <li><b>货币政策</b>：降准降息、结构性工具（专项再贷款）——影响风险资产定价；</li>
+        <li><b>对接大师</b>：政策是索罗斯所说的"维持趋势的工具"，政策弹药耗尽（tool_used_up）即衰竭前兆——对应分诊问题 Q7。</li>
+      </ul></div>
+      <div class="info-card"><h3>📊 板块层（决定目标）</h3><ul>
+        <li><b>板块资金流</b>：主力/北向资金净流入排行、板块成交额占比——钱去哪了；</li>
+        <li><b>板块催化</b>：涨价函、订单公告、行业数据（装机量/销量/招标）——叙事被验证还是被证伪；</li>
+        <li><b>龙头表现</b>：板块内最强股是否持续领涨、是否出现补涨扩散——利弗莫尔"板块是交易基本单位"；</li>
+        <li><b>对接大师</b>：P6 龙头模式要求"板块共振日"，板块热度页（sector.html）提供数据化热度评分。</li>
+      </ul></div>
+      <div class="info-card"><h3>🎯 个股层（决定买卖点）</h3><ul>
+        <li><b>公告类</b>：业绩预告/快报、重大合同、重组停复牌、减持/增持、股权激励——直接影响第二天的竞价与走势；</li>
+        <li><b>量价类</b>：放量突破/缩量回踩/涨停封板质量——与 Playbook 模式直接对接；</li>
+        <li><b>风险类</b>：问询函、立案调查、ST 风险、商誉减值——触发风控铁律"不清仓也减仓"；</li>
+        <li><b>对接大师</b>：个股公告先过"60秒清单"，再问"假设与证伪条件"——不让单条消息推翻整个系统。</li>
+      </ul></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>三、信息流联动演示：一条新闻如何传导成交易决策<span class="k">点开场景看传导链</span></h2>
+    <p class="small">同一信息在不同层级作用不同：宏观定仓位、政策定方向、板块定目标、个股定买卖点。点击场景，看它如何沿四层漏斗传导并触发大师思想映射——这就是"资讯 × 决策框架"的联动。</p>
+    <div class="link-tabs" id="linkTabs">
+      <button class="mkt-btn" data-s="0" onclick="showLink(0)">① 央行降准放水</button>
+      <button class="mkt-btn" data-s="1" onclick="showLink(1)">② 产业政策扶持 AI</button>
+      <button class="mkt-btn" data-s="2" onclick="showLink(2)">③ 板块资金流入共振</button>
+      <button class="mkt-btn" data-s="3" onclick="showLink(3)">④ 个股业绩暴雷</button>
+    </div>
+    <div class="link-chain" id="linkChain"></div>
+    <div class="note" id="linkVerdict" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <h2>四、政策解读工作台：从政策原文到交易计划<span class="k">A股政策市的核心技能</span></h2>
+    <p class="small">A股的多数大行情由政策启动。解读政策用"五步法"：<b>是什么 → 影响哪层 → 谁受益 → 如何验证 → 怎么交易</b>。选择预设政策样本，或粘贴你看到的政策原文，按框架拆解。</p>
+    <div class="link-tabs" id="polTabs">
+      <button class="mkt-btn" data-p="0" onclick="showPolicy(0)">① 央行降准</button>
+      <button class="mkt-btn" data-p="1" onclick="showPolicy(1)">② 产业扶持 AI</button>
+      <button class="mkt-btn" data-p="2" onclick="showPolicy(2)">③ 减持新规</button>
+    </div>
+    <div class="flow-v" style="margin-top:4px">
+      <div class="flow-step"><span class="fn">✎</span><span class="fc"><b>自填政策原文</b>：<input id="polInput" type="text" placeholder="例如：国务院常务会议提出加大设备更新贷款贴息力度…" style="flex:1;min-width:200px;background:#0d1220;border:1px solid var(--line);border-radius:7px;padding:7px 10px;color:var(--txt);font-size:12.5px"> <button class="mkt-btn" onclick="applyPolicy()">拆解</button></span></div>
+    </div>
+    <div id="polOut" class="flowcard" style="margin-top:12px"></div>
+    <div class="note" style="margin-top:8px"><b>解读纪律：</b>政策是"预期差"的来源——利好落地前买入、落地后兑现（买预期卖事实）；若政策公布后市场不涨反跌，立即警觉"预期已兑现"（索罗斯反馈环断裂）。</div>
+  </div>
+
+  <div class="card">
+    <h2>五、资讯核验五问（下结论前先过闸）<span class="k">把"听到的"变成"验证过的"</span></h2>
+    <div class="checkline"><span class="ck">1️⃣</span><span><b>信源是什么级别？</b> A/B 级才可作决策输入；C 级只当情绪样本；来源不明的一律按 D 级处理。</span></div>
+    <div class="checkline"><span class="ck">2️⃣</span><span><b>是否已反映在价格里？</b> 关键一问——利好发布时股价已经大涨/涨停，说明预期已兑现（买预期卖事实）；<b>利好不涨 = 衰竭信号</b>（索罗斯），分诊问题 Q5 的意义正在于此。</span></div>
+    <div class="checkline"><span class="ck">3️⃣</span><span><b>是事实还是观点/预期？</b> 事实（已发生的公告、数据）可用；观点与预测（大V喊单、目标价）只当参考，永远不构成买卖依据。</span></div>
+    <div class="checkline"><span class="ck">4️⃣</span><span><b>影响层级在哪一层？</b> 宏观/政策/板块/个股——同一消息按层级决定它影响仓位、目标还是买卖点，别拿个股消息当宏观信号用。</span></div>
+    <div class="checkline"><span class="ck">5️⃣</span><span><b>它改变我的计划吗？</b> 若答案是"不改变"，直接忽略（减少操作=减少犯错）；若"改变"，必须先重跑 60 秒清单与风控铁律，禁止盘中临时起意。</span></div>
+  </div>
+
+  <div class="card">
+    <h2>六、资讯 × 大师思想对接表<span class="k">让新闻进入决策框架</span></h2>
+    <table class="tbl">
+      <tr><th>你看到的资讯</th><th>对应思想</th><th>信号含义</th><th>行动</th></tr>
+      <tr><td>利好发布但指数/个股不涨</td><td>索罗斯 反馈环断裂</td><td class="red">衰竭（Q5/Q6）</td><td>减仓、禁追高、进入 P4 盯防</td></tr>
+      <tr><td>政策/资金持续加码、叙事升温</td><td>索罗斯 正反馈初段</td><td class="green">加速（Q2/Q3）</td><td>P3 初段跟进、设证伪条件</td></tr>
+      <tr><td>产业政策 + 板块放量共振</td><td>利弗莫尔 板块最小阻力</td><td class="green">趋势（Q2/Q3）</td><td>P6 龙头跟随 / P1 突破</td></tr>
+      <tr><td>龙头滞涨、补涨股乱飞</td><td>利弗莫尔 趋势末端特征</td><td class="amber">衰减</td><td>减仓兑现、不再追涨</td></tr>
+      <tr><td>恐慌性利空引发单日长阴</td><td>利弗莫尔 不接飞刀</td><td class="red">恐慌（Q8）</td><td>空仓等企稳，次日看 Q9</td></tr>
+      <tr><td>谣言/内幕/荐股消息</td><td>利弗莫尔 破产教训</td><td class="red">噪音</td><td>拉黑，绝不作为依据</td></tr>
+    </table>
+    <div class="flowcard"><b>一句话原则：</b>新闻是"检验假设的燃料"，不是"开仓的理由"。先有 Playbook 模式与假设，再用新闻去验证或证伪——顺序反了，就是被市场牵着走。</div>
+  </div>
+
+  <div class="card">
+    <h2>七、市场情绪温度计：把 C 级信息变成可量化信号<span class="k">情绪利用——用反身性测量市场</span></h2>
+    <p class="small">散户情绪是索罗斯反身性的燃料：<b>冷时孕育机会、热时酝酿反转</b>。拖动五项滑杆（依据当日盘面与 C 级信息观察打分），实时得到情绪温度与大师裁决。C 级信息（股吧/雪球/大V）不是决策依据，而是<b>情绪温度计的读表</b>。</p>
+    <div id="tempMeters">
+      <div class="tm-row"><span class="tm-name">🔥 涨停家数/连板高度（赚钱效应）</span><input type="range" min="0" max="100" value="45" class="tm-slider" data-w="0.28" oninput="updateTemp()"><span class="tm-val" id="tm0">45</span></div>
+      <div class="tm-row"><span class="tm-name">💬 散户讨论热度（股吧/雪球刷屏度）</span><input type="range" min="0" max="100" value="50" class="tm-slider" data-w="0.22" oninput="updateTemp()"><span class="tm-val" id="tm1">50</span></div>
+      <div class="tm-row"><span class="tm-name">💸 两融余额/成交额（杠杆参与度）</span><input type="range" min="0" max="100" value="45" class="tm-slider" data-w="0.2" oninput="updateTemp()"><span class="tm-val" id="tm2">45</span></div>
+      <div class="tm-row"><span class="tm-name">🚀 新基金发行/开户数（增量资金）</span><input type="range" min="0" max="100" value="40" class="tm-slider" data-w="0.15" oninput="updateTemp()"><span class="tm-val" id="tm3">40</span></div>
+      <div class="tm-row"><span class="tm-name">🎡 板块轮动速度（扩散还是抱团）</span><input type="range" min="0" max="100" value="50" class="tm-slider" data-w="0.15" oninput="updateTemp()"><span class="tm-val" id="tm4">50</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;margin-top:14px">
+      <div id="tempGauge" class="temp-gauge">47°</div>
+      <div style="flex:1">
+        <div class="temp-bar"><div id="tempFill" style="width:47%"></div></div>
+        <div class="temp-scale"><span>0 冰点</span><span>30 温和</span><span>55 升温</span><span>75 过热</span><span>100</span></div>
+        <div id="tempZone" class="temp-zone">🌡️ 温和区：正常执行模式</div>
+      </div>
+    </div>
+    <div id="tempVerdict" class="flowcard" style="margin-top:12px"></div>
+    <div class="note" style="margin-top:8px"><b>情绪背离检查（最关键的一步）：</b>把温度计读数与指数表现对照——若<b>消息热度高（≥70）而指数不涨/滞涨</b>，立即标记为"预期已兑现/反馈环断裂"（索罗斯），哪怕温度很高也要执行减仓纪律；反之<b>冰点+缩量企稳</b>往往是新一轮行情的种子（利弗莫尔：大行情始于关键点，而非情绪最热时）。</div>
+    <div style="margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="mkt-btn" onclick="saveTemp()">📌 记录今日温度</button>
+      <span class="small" id="tempSaved"></span>
+    </div>
+    <div id="tempHistory" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <h2>八、盘前信息作战 SOP（每日 15 分钟）<span class="k">固定流程 = 稳定输出</span></h2>
+    <div class="flow-v">
+      <div class="flow-step"><span class="fn">1</span><span class="fc"><b>隔夜扫描（5分钟）</b>：外围（美股/欧股/亚太）、A50 期指、人民币汇率、隔夜政策与公告——建立"今天的大环境"。</span></div>
+      <div class="flow-step"><span class="fn">2</span><span class="fc"><b>开盘前定调（3分钟）</b>：打开「决策台」回答盘面问题 → 大师分诊给出裁决（仓位上限/模式集合）——先定"能不能做、做多重"。</span></div>
+      <div class="flow-step"><span class="fn">3</span><span class="fc"><b>板块验证（3分钟）</b>：看板块热度页 → 是否有板块共振、龙头是否健康——定"做什么方向"。</span></div>
+      <div class="flow-step"><span class="fn">4</span><span class="fc"><b>个股对表（2分钟）</b>：候选股公告/竞价 → 与 Playbook 模式逐项核对 → 过 60 秒清单——定"具体买不买、买多少"。</span></div>
+      <div class="flow-step"><span class="fn">5</span><span class="fc"><b>盘中纪律（持续）</b>：只看 A/B 级快讯与自选股异动；C 级情绪刷屏<b>只在收盘后</b>作为反身性观测记录；D 级全程屏蔽。</span></div>
+      <div class="flow-step"><span class="fn">6</span><span class="fc"><b>收盘复盘（5分钟）</b>：信息→价格核对（今天哪条消息兑现/证伪了哪个假设），写进交易日志——形成"资讯-交易"闭环数据。</span></div>
+    </div>
+    <h3 style="margin-top:18px">✅ 盘前检查清单（可勾选，自动保存本机）</h3>
+    <div id="precheck"></div>
+    <div class="small" style="margin-top:6px">全部勾选 = 今天的信息流已处理完毕，可以进入决策台执行。勾选状态保存在本浏览器 localStorage，每日自动重置需手动取消（或点击"重置"）。</div>
+    <button class="mkt-btn" style="margin-top:8px" onclick="resetPrecheck()">重置今日清单</button>
+  </div>
+
+  <div class="card">
+    <h2>九、交易日志：收盘复盘，把信息变成可改进的闭环<span class="k">SOP 第 6 步的落点</span></h2>
+    <p class="small">每天收盘后 5 分钟，回答四个问题并保存。日志是<b>与市场对话的记录</b>——利弗莫尔用笔记追踪自己的错误，道格拉斯用统计代替情绪。累积 20 条后回头读，你会看到自己的模式。</p>
+    <div class="jr-form">
+      <div class="tm-row"><span class="tm-name">📅 日期</span><input id="jrDate" type="date" class="jr-inp" style="flex:1"></div>
+      <div class="tm-row"><span class="tm-name">🎯 今日操作</span><select id="jrOp" class="jr-inp" style="flex:1"><option>空仓观望</option><option>买入</option><option>卖出/止盈</option><option>止损离场</option><option>持有不动</option></select></div>
+      <div class="tm-row"><span class="tm-name">🌡️ 收盘情绪温度</span><select id="jrTemp" class="jr-inp" style="flex:1"><option>冰点（&lt;30）</option><option>温和（30-55）</option><option>升温（55-75）</option><option>过热（&gt;75）</option></select></div>
+      <div class="tm-row"><span class="tm-name">🧾 信息→价格核对</span><textarea id="jrInfo" rows="2" class="jr-inp" style="flex:1" placeholder="今天哪条信息兑现/证伪了哪个假设？例如：AI 政策发布但板块冲高回落 = 预期已兑现…"></textarea></div>
+      <div class="tm-row"><span class="tm-name">⚖️ 纪律执行</span><select id="jrDisc" class="jr-inp" style="flex:1"><option>完全遵守</option><option>部分遵守（有偏差）</option><option>违反（需复盘）</option></select></div>
+      <div class="tm-row"><span class="tm-name">📋 明日计划</span><textarea id="jrPlan" rows="2" class="jr-inp" style="flex:1" placeholder="模式/候选标的/证伪条件：明日只做 P1 突破，若高开 3% 以上放弃…"></textarea></div>
+      <div style="display:flex;gap:10px;margin-top:10px">
+        <button class="mkt-btn" onclick="saveEntry()">💾 保存今日日志</button>
+        <span class="small" style="align-self:center">已保存 <b id="jrCount">0</b> 条（本机 localStorage）</span>
+      </div>
+    </div>
+    <div id="jrList" class="flow-v" style="margin-top:12px"></div>
+  </div>
+
+  <div class="disclaimer">⚠️ 教学与研究用途，不构成投资建议。资讯分级与核验是对公开方法论（利弗莫尔/索罗斯/道格拉斯）的规则化整理；政策与市场信息请以官方渠道为准。请严格执行风控铁律，自行承担全部交易后果。</div>
+</div>
+
+<script>
+const PRECHECK = [
+  "外围扫描完成：美股/欧股/亚太/汇率/商品已过目",
+  "A50 期指与隔夜政策已确认（有无影响开盘的重大消息）",
+  "大师分诊已答完 9 问，仓位上限与模式集合已确定",
+  "板块热度已看：有无共振板块、龙头是否健康",
+  "候选股公告/竞价已核对，与 Playbook 模式逐项比对",
+  "60 秒清单已过，买卖点与止损位已写下",
+  "风控铁律已复诵：单笔止损、总仓位、不摊平",
+  "今日信息全部按 A/B/C/D 分级过滤完毕"
+];
+// 信息流联动场景：宏观→政策→板块→个股 传导链（含大师思想映射）
+const LINKS = [
+  { name:"① 央行降准放水", verdict:"裁决：宏观层放水 = 风险偏好抬升，P3 加速段概率升高，但方向未定——升仓位上限、禁满仓追高，等政策/板块确认方向。",
+    steps:[
+      {t:"宏观", s:"央行宣布降准 0.5 个百分点，释放长期资金约 1 万亿元", m:"利弗莫尔『时间要素』：大趋势需要资金与时间配合，放水是趋势的燃料而非趋势本身。"},
+      {t:"政策", s:"同日 MLF 中标利率下行，政策组合拳确认宽松取向", m:"索罗斯『维持趋势的工具』：政策弹药未耗尽前，正反馈可延续；进入 Q2/Q3 观察窗口。"},
+      {t:"板块", s:"券商板块早盘放量领涨、成交额占比跃升，北向资金净流入居前", m:"利弗莫尔『板块是交易基本单位』：金融板块是流动性行情的先行指标。"},
+      {t:"个股", s:"候选股出现『放量突破 60 日新高』形态，满足 P1/P3 模式初段", m:"道格拉斯『概率思维』：入场只代表概率优势，设好证伪条件——政策不及预期即退出。"}
+    ]},
+  { name:"② 产业政策扶持 AI", verdict:"裁决：政策层催生叙事 = 反身性起点，但需板块资金验证——定方向做 AI 链，未共振前只观察不追高。",
+    steps:[
+      {t:"政策", s:"工信部发布 AI 产业扶持文件，算力/大模型列为重点方向", m:"索罗斯『反身性起点』：政策创造叙事，叙事吸引资金，资金强化叙事——但初始阶段真假难辨。"},
+      {t:"宏观", s:"流动性平稳、风险偏好中性，未出现系统性利空", m:"利弗莫尔『环境』：政策再好，大环境不配合则趋势难以持续。"},
+      {t:"板块", s:"AI 板块次日放量上涨，龙头涨停、板块内扩散", m:"利弗莫尔『板块共振日』：P6 龙头模式的入场前提——板块共振才算数。"},
+      {t:"个股", s:"算力龙头强于板块、缩量回踩 5 日线企稳，满足 P6 买点", m:"道格拉斯『以系统而非单次结果论英雄』：按模式信号执行，单笔盈亏不改变纪律。"}
+    ]},
+  { name:"③ 板块资金流入共振", verdict:"裁决：板块层目标明确 = 最强的交易信号，但个股层必须健康——选最强龙头，设板块降温即离场的证伪条件。",
+    steps:[
+      {t:"板块", s:"半导体板块连续 3 日主力净流入居前，成交额占比创新高", m:"利弗莫尔『最小阻力线』：资金持续流入的方向就是阻力最小的方向。"},
+      {t:"宏观", s:"社融数据超预期，M2 增速回升，流动性环境友好", m:"利弗莫尔『时间要素』：宏观配合时趋势更易延续，仓位可上调一档。"},
+      {t:"政策", s:"国产替代政策加码，产业叙事持续强化", m:"索罗斯『正反馈』：政策+资金双轮驱动，趋势自我强化阶段。"},
+      {t:"个股", s:"龙头股封板质量高、封单稳，但补涨股已现——跟踪趋势末端信号", m:"利弗莫尔『趋势末端特征』：龙头滞涨+补涨乱飞=衰减前兆，逐步兑现。"}
+    ]},
+  { name:"④ 个股业绩暴雷", verdict:"裁决：先自上而下审视利空影响层级——宏观未变则不动大盘判断，板块未跟跌则是个体问题，最后才处理个股：触发风控铁律『不清仓也减仓』，不接飞刀。",
+    steps:[
+      {t:"宏观", s:"大盘环境未变，无系统性风险——个股利空不改变宏观与仓位判断", m:"索罗斯『区分基本面与认知』：市场对个股的认知已修正，但宏观趋势未变，勿以个体恐慌推翻整体判断。"},
+      {t:"政策", s:"无政策面配合的个体利空，不影响政策主线方向", m:"道格拉斯『区分噪声与信号』：单票利空≠系统信号，政策主线的逻辑未被证伪。"},
+      {t:"板块", s:"板块龙头未跟跌，说明是个体问题而非行业问题", m:"利弗莫尔『板块是交易基本单位』：板块健康则个股问题可单独处理，不株连整个方向。"},
+      {t:"个股", s:"持仓股业绩预亏、竞价低开——按纪律减仓至风控线内，利空未消化前不抄底", m:"利弗莫尔『不接飞刀』+『破产教训』：让市场先完成定价，保住本金才能等到下一个机会——活下来比赚得多重要。"}
+    ]}
+];
+function showLink(i){
+  document.querySelectorAll('#linkTabs .mkt-btn').forEach((b,bi)=>b.classList.toggle('on', bi===i));
+  const L = LINKS[i];
+  const chain = L.steps.map((s,si)=>`
+    <div class="lc-step">
+      <span class="lc-tag lc-${['m','p','b','s'][si]||'m'}">${s.t}</span>
+      <span class="lc-body"><b>${s.s}</b><br><span class="lc-master">↳ ${s.m}</span></span>
+    </div>${si<L.steps.length-1?'<div class="lc-arrow">▼</div>':''}`).join('');
+  document.getElementById('linkChain').innerHTML = chain;
+  document.getElementById('linkVerdict').innerHTML = `<b>📌 决策裁决：</b>${L.verdict}`;
+}
+// 政策解读工作台：五步法（是什么/影响哪层/谁受益/如何验证/怎么交易）
+const POLICIES = [
+  { name:"央行降准", src:"央行宣布下调金融机构存款准备金率 0.5 个百分点，释放长期资金约 1 万亿元。",
+    five:[
+      ["① 是什么","央行全面降准 0.5pct，属总量型宽松货币政策，直接增加银行可贷资金、降低资金成本。"],
+      ["② 影响哪层","宏观层：流动性预期改善 → 风险偏好抬升；政策层：确认宽松取向（若与 MLF/LPR 联动则信号更强）。"],
+      ["③ 谁受益","金融（券商/银行）最先反应；高负债成长板块（科技/地产链）弹性大；全市场估值中枢上移。"],
+      ["④ 如何验证","看次日成交额是否放量（沪市 ≥5000 亿）、券商板块是否领涨且北向资金流入——验证通过才确认趋势启动。"],
+      ["⑤ 怎么交易","验证前不追高（降准预期常提前反映）；验证后按 P1/P3 参与，重点选券商/流动性敏感龙头；证伪条件=高开低走+缩量。"]
+    ]},
+  { name:"产业扶持 AI", src:"工信部等发布《人工智能产业创新发展行动方案》，提出到 2027 年算力规模翻番、大模型应用规模化。",
+    five:[
+      ["① 是什么","产业政策明确 AI 为战略方向，给出量化目标（算力/应用），属于「给方向+给资源」的强产业政策。"],
+      ["② 影响哪层","政策层：确立板块叙事（反身性起点）；板块层：算力/应用/数据要素细分赛道获催化；个股层：龙头订单预期升温。"],
+      ["③ 谁受益","算力（光模块/服务器/IDC）最先受益于资本开支；应用端（办公/教育/医疗）弹性大；国产替代链条同步受益。"],
+      ["④ 如何验证","观察板块是否连续放量上涨、龙头是否率先创新高、是否扩散至低位补涨——叙事进入自我强化阶段（索罗斯正反馈）。"],
+      ["⑤ 怎么交易","首日不追（政策首日易冲高回落）；等板块共振日（P6 前提）选龙头回踩买点；严守证伪条件=政策热度退潮但业绩不兑现。"]
+    ]},
+  { name:"减持新规", src:"证监会发布股份减持新规：控股股东、实控人破发、破净、分红不达标不得减持，从严约束。",
+    five:[
+      ["① 是什么","制度型监管政策，收紧大股东减持条件，属「改变游戏规则」的规则类政策。"],
+      ["② 影响哪层","政策层：改善市场供需结构、修复风险偏好；个股层：破发/破净/分红不达标个股的抛压预期下降。"],
+      ["③ 谁受益","高股息/低估值板块（破净蓝筹）修复预期；次新股与高分红股受益；垃圾股逻辑弱化（壳价值下降）。"],
+      ["④ 如何验证","看政策发布后破净蓝筹是否放量修复、指数是否止跌企稳——规则类政策对情绪的影响快于对基本面的影响。"],
+      ["⑤ 怎么交易","适合作为「环境改善」信号提升仓位上限，而非直接买入理由；优选高分红+低位+资金流入方向；警惕利好兑现后的获利回吐。"]
+    ]}
+];
+function renderPolicy(p){
+  const rows = p.five.map(f=>`<div class="checkline"><span class="ck">${f[0]}</span><span><b>${f[1]}</b></span></div>`).join('');
+  return `<div class="small" style="margin-bottom:6px"><b>政策原文：</b>${p.src}</div>${rows}`;
+}
+function showPolicy(i){
+  document.querySelectorAll('#polTabs .mkt-btn').forEach((b,bi)=>b.classList.toggle('on', bi===i));
+  document.getElementById('polOut').innerHTML = renderPolicy(POLICIES[i]);
+}
+function applyPolicy(){
+  const txt = document.getElementById('polInput').value.trim();
+  if(!txt){ document.getElementById('polOut').innerHTML = `<div class="small" style="color:var(--amber)">请先粘贴政策原文。</div>`; return; }
+  document.querySelectorAll('#polTabs .mkt-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('polOut').innerHTML = `<div class="small" style="margin-bottom:6px"><b>你的政策原文：</b>${txt.replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</div>
+    <div class="checkline"><span class="ck">①</span><span><b>是什么？</b> 用一句话复述政策核心动作与量化目标（看不清就先查官方通稿）。</span></div>
+    <div class="checkline"><span class="ck">②</span><span><b>影响哪层？</b> 宏观（仓位）/ 政策（方向）/ 板块（目标）/ 个股（买卖点）——选一层主影响。</span></div>
+    <div class="checkline"><span class="ck">③</span><span><b>谁受益？</b> 写出受益板块与逻辑链（政策→需求→订单→业绩），再写受损方。</span></div>
+    <div class="checkline"><span class="ck">④</span><span><b>如何验证？</b> 定一个可观察的验证信号（板块放量/龙头新高/北向流入），未验证不动手。</span></div>
+    <div class="checkline"><span class="ck">⑤</span><span><b>怎么交易？</b> 对表 Playbook 模式：预期差买入还是共振日确认？证伪条件写清楚才允许开仓。</span></div>`;
+}
+// 市场情绪温度计：五项加权 → 温度 → 大师裁决
+const TEMP_WEIGHTS = [0.28, 0.22, 0.20, 0.15, 0.15];
+// 情绪温度历史记录（localStorage 持久化，与交易日志联动复盘）
+function getTempHistory(){ try { return JSON.parse(localStorage.getItem('dsh_temp_history') || '{}'); } catch(e){ return {}; } }
+function currentTemp(){ const g = document.getElementById('tempGauge'); return g ? parseInt(g.textContent, 10) || 0 : 0; }
+function saveTemp(){
+  const d = new Date().toISOString().slice(0,10);
+  const h = getTempHistory();
+  h[d] = currentTemp();
+  localStorage.setItem('dsh_temp_history', JSON.stringify(h));
+  renderTempHistory();
+}
+function delTemp(d){
+  const h = getTempHistory();
+  delete h[d];
+  localStorage.setItem('dsh_temp_history', JSON.stringify(h));
+  renderTempHistory();
+}
+function renderTempHistory(){
+  const h = getTempHistory();
+  const dates = Object.keys(h).sort().slice(-14);
+  document.getElementById('tempSaved').textContent = `已记录 ${Object.keys(h).length} 天`;
+  const el = document.getElementById('tempHistory');
+  el.innerHTML = dates.length
+    ? `<div class="small" style="margin-bottom:6px;color:var(--faint)">温度历史（近 ${dates.length} 次记录）：从冷到热再到冷的完整循环 = 一次行情的生命周期——利弗莫尔「趋势有开端也有终点」，索罗斯「反身性最终反转」。复盘时与交易日志对照：你在升温段做了什么、过热段是否减仓。</div>
+      <div style="display:flex;gap:4px;align-items:flex-end;height:60px">
+      ${dates.map(d => {
+        const v = h[d];
+        const color = v>=75?'#ef6a60':v>=55?'#ffd166':v>=30?'#52d38a':'#5aa7ff';
+        return `<div style="flex:1;text-align:center;min-width:0" title="${d} ${v}°"><div style="height:${Math.max(6, v*0.5)}px;background:${color};border-radius:3px 3px 0 0;cursor:pointer" onclick="delTemp('${d}')"></div><div style="font-size:9px;color:var(--faint);overflow:hidden">${d.slice(5)}</div></div>`;
+      }).join('')}
+      </div>`
+    : '<div class="small" style="color:#5b6a85">还没有温度记录。收盘后拖动滑杆定下今日读数，点「记录今日温度」——连续记录，你才能看见情绪周期，而不是被单日情绪牵着走。</div>';
+}
+function updateTemp(){
+  let t = 0;
+  for(let i=0;i<5;i++){
+    const v = parseInt(document.getElementById('tm'+i).value, 10) || 0;
+    t += v * TEMP_WEIGHTS[i];
+  }
+  t = Math.round(t);
+  document.getElementById('tempGauge').textContent = t + '°';
+  document.getElementById('tempFill').style.width = t + '%';
+  const zone = document.getElementById('tempZone');
+  const vd = document.getElementById('tempVerdict');
+  if(t < 30){
+    zone.className = 'temp-zone zone-cold';
+    zone.textContent = '❄️ 冰点区：恐慌出清，机会在孕育';
+    vd.innerHTML = `<b>大师裁决（利弗莫尔）：</b>冰点=市场绝望时——但<u>绝不接飞刀</u>，空仓或轻仓等待「企稳关键点」信号（缩量止跌+首根放量阳线）。<b>冰点不是买入理由，企稳才是。</b>索罗斯视角：此阶段反身性向下自我强化，别猜底，等反馈环反转的第一个确认信号。`;
+  } else if(t < 55){
+    zone.className = 'temp-zone zone-mild';
+    zone.textContent = '🌡️ 温和区：正常执行模式';
+    vd.innerHTML = `<b>大师裁决（道格拉斯）：</b>情绪温和=市场未被扭曲，按 Playbook 模式与盘面信号正常执行，仓位按分诊裁决。<b>不因情绪平淡而降低标准</b>——模式出现就做，模式不出现就等，情绪温度不改变纪律。`;
+  } else if(t < 75){
+    zone.className = 'temp-zone zone-warm';
+    zone.textContent = '🔥 升温区：赚钱效应扩散，正反馈进行中';
+    vd.innerHTML = `<b>大师裁决（索罗斯）：</b>升温=反身性正反馈自我强化阶段——趋势延续概率高，可持仓但<u>必须设证伪条件</u>（政策弹药耗尽 tool_used_up、利好不涨）。利弗莫尔：升温期允许加仓最强板块龙头，但开始盯「趋势末端特征」（龙头滞涨+补涨乱飞）。`;
+  } else {
+    zone.className = 'temp-zone zone-hot';
+    zone.textContent = '🌋 过热区：情绪亢奋，反转风险聚集';
+    vd.innerHTML = `<b>大师裁决（利弗莫尔+索罗斯）：</b>过热=大众疯狂——利弗莫尔「趋势末端特征」与索罗斯「反身性即将反转」同时亮灯。<u>纪律：减仓兑现、禁追高、禁新开仓</u>；保留底仓观察「最后一个确认信号」（放量长阴/政策转向）。记住：<b>情绪最热时买入，是散户亏损的第一原因。</b>`;
+  }
+}
+function renderPrecheck(){
+  const saved = JSON.parse(localStorage.getItem('dsh_precheck') || '[]');
+  const el = document.getElementById('precheck');
+  if(!el) return;
+  el.innerHTML = PRECHECK.map((t,i)=>{
+    const on = saved.includes(i);
+    return `<label class="checkline" style="cursor:pointer"><span class="ck">${on?'✅':'⬜'}</span>
+      <span style="flex:1"><input type="checkbox" data-i="${i}" ${on?'checked':''} onchange="togglePre(${i})"> ${t}</span></label>`;
+  }).join('');
+}
+// 交易日志：localStorage 持久化（按日期键）
+function getJournal(){ try { return JSON.parse(localStorage.getItem('dsh_journal') || '{}'); } catch(e){ return {}; } }
+function esc(s){ return String(s||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
+function saveEntry(){
+  const date = document.getElementById('jrDate').value || new Date().toISOString().slice(0,10);
+  const j = getJournal();
+  j[date] = {
+    op: document.getElementById('jrOp').value,
+    temp: document.getElementById('jrTemp').value,
+    info: document.getElementById('jrInfo').value.trim(),
+    disc: document.getElementById('jrDisc').value,
+    plan: document.getElementById('jrPlan').value.trim()
+  };
+  localStorage.setItem('dsh_journal', JSON.stringify(j));
+  renderJournal();
+}
+function delEntry(date){
+  const j = getJournal();
+  delete j[date];
+  localStorage.setItem('dsh_journal', JSON.stringify(j));
+  renderJournal();
+}
+function renderJournal(){
+  const j = getJournal();
+  const dates = Object.keys(j).sort().reverse().slice(0,10);
+  document.getElementById('jrCount').textContent = Object.keys(j).length;
+  const el = document.getElementById('jrList');
+  el.innerHTML = dates.length ? dates.map(d=>{
+    const e = j[d];
+    const discTag = e.disc==='违反（需复盘）' ? ' style="color:var(--red)"' : (e.disc==='部分遵守（有偏差）' ? ' style="color:var(--amber)"' : ' style="color:var(--green)"');
+    return `<div class="jr-entry">
+      <div class="jr-h"><b>${d} · ${esc(e.op)}</b><button class="jr-x" onclick="delEntry('${d}')" title="删除">✕</button></div>
+      <div>🌡️ ${esc(e.temp)} &nbsp;|&nbsp; ⚖️ <span${discTag}>${esc(e.disc)}</span></div>
+      ${e.info?`<div style="margin-top:4px">🧾 <b>信息核对：</b>${esc(e.info)}</div>`:''}
+      ${e.plan?`<div style="margin-top:4px">📋 <b>明日计划：</b>${esc(e.plan)}</div>`:''}
+    </div>`;
+  }).join('') : `<div class="small" style="color:#5b6a85">还没有日志。今天收盘后写下第一条——哪怕只是"空仓观望"，也是在积累数据。</div>`;
+}
+function togglePre(i){
+  let s = JSON.parse(localStorage.getItem('dsh_precheck') || '[]');
+  s = s.includes(i) ? s.filter(x=>x!==i) : [...s, i];
+  localStorage.setItem('dsh_precheck', JSON.stringify(s));
+  renderPrecheck();
+}
+function resetPrecheck(){
+  localStorage.removeItem('dsh_precheck');
+  renderPrecheck();
+}
+renderPrecheck();
+renderJournal();
+renderTempHistory();
+showLink(0);
+showPolicy(0);
+updateTemp();
+</script>
+</body>
+</html>

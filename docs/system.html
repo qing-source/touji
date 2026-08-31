@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>系统体检与完善 · 短线交易系统 v2.0</title>
+<link rel="stylesheet" href="style.css?v=6">
+<style>
+.prob{background:linear-gradient(180deg,#171c28,#10141d);border:1px solid var(--line);border-radius:13px;padding:16px 18px;margin-bottom:12px}
+.prob .ph{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.prob .num{color:var(--gold2);font-weight:800;font-size:15px}
+.prob .pt{font-weight:650;font-size:14.5px;color:var(--txt)}
+.prob .pl{color:var(--faint);font-size:12px}
+.prob p{font-size:13.5px;color:#c4cede;margin:7px 0}
+.prob .fix{background:rgba(62,207,142,.07);border-left:3px solid var(--green);border-radius:0 9px 9px 0;padding:9px 13px;font-size:13px;color:#bcd8ca;margin-top:8px}
+.map table{font-size:13px}
+.map td:first-child{white-space:nowrap}
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:12px}
+.calc .c{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:14px}
+.calc .c label{font-size:11.5px;color:var(--sub);display:block;margin-bottom:5px}
+.calc .c input{width:100%}
+.calc .c .out{font-size:17px;font-weight:750;color:var(--gold2);margin-top:8px;text-align:center}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.fields .f{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px 14px;font-size:13px;color:#c4cede}
+.fields .f b{color:var(--gold2)}
+ol.debrief{padding-left:22px}
+ol.debrief li{margin:8px 0;font-size:13.5px;color:#c4cede}
+ol.debrief li b{color:var(--gold2)}
+</style>
+</head>
+<body>
+
+<nav class="navbar"><div class="nav-inner">
+  <div class="brand"><span class="mark">◈</span>大师投机决策台</div>
+  <div class="nav-links">
+    <a href="index.html">决策台</a>
+    <a href="sector.html">板块热度</a>
+    <a href="news.html">资讯雷达</a>
+    <a href="theory.html">真实思想</a>
+    <a href="skills.html">Skill 图解</a>
+    <a href="backtest.html">回测验证</a>
+    <a href="system.html" class="active">系统完善</a>
+  </div>
+</div></nav>
+
+<div class="hero"><div class="hero-inner">
+  <span class="eyebrow">System Audit · 系统体检</span>
+  <h1>从投机思想审视现行系统 · 构建 v2.0 完整交易系统</h1>
+  <p>不满足于"能用"，而是用利弗莫尔（趋势/关键点/时间要素）、索罗斯（反身性/假设证伪）、塔勒布（反脆弱/尾部风险）的方法论逐层体检现行系统，指出 8 个结构性缺陷并逐一针对性修复，最终输出可执行、可回测、可统计的完整短线交易系统。</p>
+  <span class="badge">体检 → 缺陷定位 → 针对性修改 → v2.0 完整规范</span>
+</div></div>
+
+<div class="wrap">
+
+  <div class="card">
+    <h2>一、现行系统体检：8 个结构性缺陷</h2>
+
+    <div class="prob"><div class="ph"><span class="num">01</span><span class="pt">单一日线框架，趋势定义脆弱</span><span class="pl">状态层</span></div>
+      <p>现行系统只用日线 20 日均线判断趋势。周线级别已进入下跌趋势时，日线反弹会频繁触发"站上20日线"的假信号（2018 恒生熊市回测中趋势策略仍 -3.7% 即是证据）。</p>
+      <div class="fix">✅ 修复：引入<b>双时间框架过滤</b>——周线 20 周均线方向作为"大环境闸门"：周线向下时，日线信号一律降档执行（仓位×0.5）；周线向上才允许满档。这正对应利弗莫尔"时间要素"（大势未到时，再好的关键点也不出手）。</div>
+    </div>
+
+    <div class="prob"><div class="ph"><span class="num">02</span><span class="pt">市场状态靠人工勾选，主观不可复现</span><span class="pl">状态层</span></div>
+      <p>"利好不涨""龙头滞涨"等选项依赖人工判断，不同人勾出不同结论，且无法回测。</p>
+      <div class="fix">✅ 修复：为每个状态定义<b>可计算代理</b>（见第二节量化代理表）——例如"衰竭"用"20日涨幅进入近2年分位 90% 以上 + 5日量能萎缩"近似；让状态机可被历史数据驱动、可回测。</div>
+    </div>
+
+    <div class="prob"><div class="ph"><span class="num">03</span><span class="pt">P3/P6 模式不可回测，决策易拍脑袋</span><span class="pl">策略层</span></div>
+      <p>P3（反身性加速）与 P6（龙头跟随）依赖"叙事""板块共振"等软概念，未量化，回测页只能回避——而这两者恰是 A股短线的主要盈利来源。</p>
+      <div class="fix">✅ 修复：给出<b>量化代理</b>——P6 用"板块内当日涨停/涨幅>5% 家数 ≥2"定义共振日，"龙头"用"板块内当日成交额排名第1且涨幅居前"定义；P3 用"20日涨幅 > 15% 且当日涨幅 > 5% 且量能 > 5日均量"定义加速初段。代理不完美，但可测、可统计、可迭代。</div>
+    </div>
+
+    <div class="prob"><div class="ph"><span class="num">04</span><span class="pt">模式选择缺少唯一映射表</span><span class="pl">策略层</span></div>
+      <p>大师分诊输出"推荐模式集合"，但"什么状态该用哪个模式、多大仓位"散落在不同卡片里，执行时容易自行发挥。</p>
+      <div class="fix">✅ 修复：建立<b>状态→模式→仓位唯一映射表</b>（见第三节 v2.0 规范），每个状态只有一组允许的模式与仓位档位，杜绝自由裁量。</div>
+    </div>
+
+    <div class="prob"><div class="ph"><span class="num">05</span><span class="pt">固定 2% 单笔风险未考虑相关性</span><span class="pl">风控层</span></div>
+      <p>同时持 5 只同板块股票，每只 2% 风险 = 板块实际风险 10%。回撤中相关性趋近 1，等价于把鸡蛋放一个篮子。</p>
+      <div class="fix">✅ 修复：增加<b>板块敞口上限</b>——同一板块最多持有 2 只、板块合计风险敞口 ≤ 4%（即两笔 2%）；全账户同向敞口 ≤ 75% 不变。这符合塔勒布"不把尾部风险叠加"的反脆弱原则。</div>
+    </div>
+
+    <div class="prob"><div class="ph"><span class="num">06</span><span class="pt">止损按收盘价判断，跳空/跌停无法执行</span><span class="pl">风控层</span></div>
+      <p>回测假设"次日开盘卖出"，但 A股跌停时根本无法成交；个股闪崩可直接跳过止损位。固定 -5% 止损对高波动标的也不适配。</p>
+      <div class="fix">✅ 修复：引入<b>波动率预算（ATR 缩放）</b>——止损距离 = k × ATR(14)，仓位 = (账户×2%) ÷ 止损距离；波动越大的票仓位越小、止损越宽但风险恒定。跌停预案：触发跌停无法卖出时，次日集合竞价无条件挂单出清（利弗莫尔：止损没有借口）。</div>
+    </div>
+
+    <div class="prob"><div class="ph"><span class="num">07</span><span class="pt">交易日志缺"市场状态"字段</span><span class="pl">执行层</span></div>
+      <p>现有日志记录模式/假设/盈亏，但不知道每笔交易发生在哪种市场状态——无法回答"趋势末段做 P6 的期望值是不是负的"。</p>
+      <div class="fix">✅ 修复：日志增加<b>市场状态字段</b>（健康趋势/末段/衰竭/恐慌/弱势/不明），月底按"状态×模式"交叉统计期望值，负期望组合直接淘汰——这是索罗斯"用市场检验假设"的落地。</div>
+    </div>
+
+    <div class="prob"><div class="ph"><span class="num">08</span><span class="pt">回测无稳健性检验，存在过拟合风险</span><span class="pl">验证层</span></div>
+      <p>单点参数（成本1‰、固定止损5%）的结果可能依赖参数选择；参数抖动就变差的策略不可信。</p>
+      <div class="fix">✅ 修复：回测页新增<b>成本敏感性检验表</b>（0/1/2/3/5‰ 下总收益、回撤、笔数），若成本翻倍收益坍塌 = 策略无容错空间，应弃用；并补充参数邻域说明（±20% 内结果方向不变才视为稳健）。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>二、量化代理表（把"软概念"变成可计算信号）</h2>
+    <div class="map"><table>
+      <tr><th>概念</th><th>人工判断（旧）</th><th>量化代理（新）</th></tr>
+      <tr><td>健康趋势</td><td>指数站上20日线</td><td>收盘 > MA20 且 MA20 连续 3 日上行</td></tr>
+      <tr><td>关键点突破</td><td>突破了重要价位</td><td>收盘创 60 日新高 且 当日成交量 > 5日均量 ×1.5</td></tr>
+      <tr><td>板块共振</td><td>板块多股大涨</td><td>板块内涨幅>5% 家数 ≥ 2</td></tr>
+      <tr><td>龙头</td><td>最强的那只</td><td>板块内成交额排名第 1 且涨幅居前 3</td></tr>
+      <tr><td>加速初段(P3)</td><td>叙事升温</td><td>20日涨幅 > 15% 且 当日涨幅 > 5% 且 量 > 5日均量</td></tr>
+      <tr><td>衰竭</td><td>利好不涨/龙头滞涨</td><td>20日涨幅进入近 2 年 90 分位 且 5日量能 < 20日均量</td></tr>
+      <tr><td>恐慌</td><td>大盘暴跌</td><td>指数单日跌幅 ≤ -3% 或 跌幅超 20日σ×2</td></tr>
+      <tr><td>企稳</td><td>缩量止跌</td><td>恐慌次日 收盘>开盘 且 低点未破恐慌日低点 且 量 < 恐慌日量</td></tr>
+    </table></div>
+    <div class="note">代理是"可测的近似"，不是完美还原——这正是把投机思想工程化的代价与回报：牺牲部分主观细腻度，换取可回测、可统计、可迭代。</div>
+  </div>
+
+  <div class="card">
+    <h2>三、v2.0 交易系统规范（状态 → 模式 → 仓位 唯一映射）</h2>
+    <div class="map"><table>
+      <tr><th>状态</th><th>判定（量化代理）</th><th>允许模式</th><th>仓位档</th><th>止损/离场</th></tr>
+      <tr><td>🟢 健康趋势</td><td>周线向上 且 日线健康趋势代理成立</td><td>P1/P2/P6/P3</td><td>满档 75%</td><td>P1/P2：跌破20日线两日或-5%；P3：量增价滞</td></tr>
+      <tr><td>🔵 趋势但无热点</td><td>周线向上 且 无板块共振</td><td>P1/P2</td><td>半档 40%</td><td>同上</td></tr>
+      <tr><td>🟠 趋势末段</td><td>衰竭代理成立 且 三条件未齐</td><td>仅 P2</td><td>1/4 档 20%</td><td>收紧至10日线</td></tr>
+      <tr><td>🔴 衰竭/顶部</td><td>索罗斯三条件代理齐备</td><td>仅 P4 清仓</td><td>≤20%</td><td>出现负反馈长阴即全清</td></tr>
+      <tr><td>🌧️ 恐慌</td><td>恐慌代理成立 且 未企稳</td><td>无（空仓）</td><td>0%</td><td>—</td></tr>
+      <tr><td>🌤️ 恐慌企稳</td><td>企稳代理成立</td><td>P5（辅助，小仓）</td><td>15%</td><td>+8% 或 5日线 或 -4%</td></tr>
+      <tr><td>⚪ 弱势/不明</td><td>周线向下 或 状态不明</td><td>无</td><td>0-10%</td><td>等周线修复</td></tr>
+    </table></div>
+    <div class="note"><b>双闸门原则</b>：周线向下时，任何状态仓位 ×0.5（利弗莫尔时间要素）；索罗斯三条件成立时，任何状态直接进入 P4 流程（塔勒布尾部风险优先）。</div>
+  </div>
+
+  <div class="card">
+    <h2>四、波动率预算：ATR 仓位计算器（v2.0 风控核心）</h2>
+    <p class="small" style="margin-bottom:10px">仓位 = (账户资金 × 单笔风险率) ÷ (ATR × 止损倍数)。波动越大仓位越小，风险恒定为账户 2%。</p>
+    <div class="calc">
+      <div class="c"><label>账户资金（元）</label><input type="number" id="acct" value="100000" step="10000"></div>
+      <div class="c"><label>单笔风险率 %（默认2）</label><input type="number" id="riskp" value="2" step="0.5"></div>
+      <div class="c"><label>ATR(14) 值（元）</label><input type="number" id="atr" value="1.2" step="0.1"></div>
+      <div class="c"><label>止损倍数（ATR倍数）</label><input type="number" id="k" value="2" step="0.5"></div>
+      <div class="c"><label>预估买入价（元）</label><input type="number" id="px" value="50" step="1"></div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="box"><h3>计算输出</h3><div id="atr-out" style="font-size:14px;line-height:2">填写参数后点击计算</div></div>
+      <div class="box"><h3>操作提醒</h3><ul>
+        <li>同一板块最多 2 只、板块合计风险 ≤ 4%</li>
+        <li>若计算仓位 &gt; 状态映射表档位上限，以档位上限为准（取小）</li>
+        <li>跌停无法卖出 → 次日集合竞价无条件出清</li>
+      </ul></div>
+    </div>
+    <button class="btn btn-primary" onclick="calcATR()" style="margin-top:14px">🧮 计算仓位</button>
+  </div>
+
+  <div class="card">
+    <h2>五、亏损强制复盘模板（debrief，亏损后 30 分钟内完成）</h2>
+    <ol class="debrief">
+      <li><b>这笔亏损来自哪一层？</b> 状态误判 / 模式错配 / 执行变形 / 运气（黑天鹅）——四选一，不许选"说不清"；</li>
+      <li><b>是否违反任何一条系统规则？</b> 违反 = 记录为"纪律失败"（无论盈亏，这是唯一真正的失败）；</li>
+      <li><b>量化代理是否提前给了信号？</b> 回看当时的代理数值，确认是"信号错了"还是"我没执行"；</li>
+      <li><b>这笔交易属于哪个状态×模式组合？</b> 记入日志，供月底交叉统计；</li>
+      <li><b>下一步动作？</b> 连亏 2 笔 → 当日停止；连亏 3 笔 → 休市 2 天并复盘全部 3 笔；月回撤 10% → 仓位减半。</li>
+    </ol>
+    <div class="note">这直接落实索罗斯的"谬误性"：亏损不是失败，是假设被证伪的数据点；只有不认错才是失败（利弗莫尔棉花案）。</div>
+  </div>
+
+  <div class="card">
+    <h2>六、本次体检已同步落地的修改</h2>
+    <div class="fields">
+      <div class="f"><b>✅ 回测页</b>：新增成本敏感性检验表（0/1/2/3/5‰）；修正"买入持有"模式输出空交易的问题</div>
+      <div class="f"><b>✅ 决策台日志</b>：新增"市场状态"字段，支持状态×模式期望值统计</div>
+      <div class="f"><b>✅ 大师分诊</b>：修正道格拉斯纪律卡信号逻辑（按综合仓位档位判定"正常/收紧"）</div>
+      <div class="f"><b>✅ 导航</b>：新增本页入口，五页互通</div>
+      <div class="f"><b>⏳ 待办（需个股数据源）</b>：P6/P3 量化代理的板块级回测（需板块成分与个股行情，当前数据仅到指数级）</div>
+    </div>
+  </div>
+
+  <div class="disclaimer">⚠️ 教学与研究用途，不构成投资建议。v2.0 系统是对历史思想的工程化重构，量化代理是近似而非完美还原；过去表现不代表未来。请严格执行风控，自行承担全部交易后果。</div>
+</div>
+
+<script>
+function calcATR(){
+  const acct=+document.getElementById("acct").value||0;
+  const risk=+document.getElementById("riskp").value||2;
+  const atr=+document.getElementById("atr").value||1;
+  const k=+document.getElementById("k").value||2;
+  const px=+document.getElementById("px").value||1;
+  const riskAmt=acct*risk/100;
+  const stopDist=atr*k;
+  const shares=Math.floor(riskAmt/stopDist);
+  const cost=shares*px;
+  const stopPx=px-stopDist;
+  const out=document.getElementById("atr-out");
+  if(!shares||shares<1){out.innerHTML="⚠️ 参数异常：ATR或止损倍数过小，无法计算";return;}
+  out.innerHTML=
+    `<div class="row"><span class="lbl" style="color:var(--faint)">单笔风险金额</span>：<b>${riskAmt.toLocaleString()} 元</b></div>`+
+    `<div class="row"><span class="lbl" style="color:var(--faint)">止损距离</span>：${stopDist.toFixed(2)} 元（${(stopDist/px*100).toFixed(1)}%）</div>`+
+    `<div class="row"><span class="lbl" style="color:var(--faint)">建议股数</span>：<b>${shares} 股</b>（约 ${(cost/acct*100).toFixed(1)}% 仓位）</div>`+
+    `<div class="row"><span class="lbl" style="color:var(--faint)">止损价</span>：<b style="color:var(--red)">${stopPx.toFixed(2)}</b></div>`+
+    `<div class="row"><span class="lbl" style="color:var(--faint)">名义成本</span>：${cost.toLocaleString()} 元</div>`;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "shc": {
+    "source": "新浪财经 CN_MarketDataService (sh000001)",
+    "rows": 1500,
+    "first": "2020-06-24",
+    "last": "2026-08-28"
+  },
+  "hsi": {
+    "source": "腾讯证券 ifzq.gtimg.cn (hkHSI)",
+    "rows": 2000,
+    "first": "2018-07-17",
+    "last": "2026-08-28"
+  },
+  "spx": {
+    "source": "腾讯证券 ifzq.gtimg.cn (us.INX)",
+    "rows": 2000,
+    "first": "2018-09-13",
+    "last": "2026-08-28"
+  }
+}

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill 图解 · 蒸馏过程与K线实例</title>
+<link rel="stylesheet" href="style.css?v=6">
+<style>
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:14px;font-size:13px}
+.step .n{font-size:22px;font-weight:800;color:var(--gold)}
+.pbox{background:linear-gradient(180deg,#111c33,#0d1526);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:18px;box-shadow:0 8px 26px rgba(0,0,0,.3)}
+.pbox .head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;border:1px solid var(--line)}
+.pname{font-size:15.5px;font-weight:700}
+.psrc{font-size:11.5px;color:var(--sub)}
+.klabel{font-size:12px;color:var(--sub);margin:8px 2px 0}
+ol.flow{padding-left:22px}ol.flow li{margin:8px 0}
+</style>
+</head>
+<body>
+
+<nav class="navbar"><div class="nav-inner">
+  <div class="brand"><span class="mark">◈</span>大师投机决策台</div>
+  <div class="nav-links">
+    <a href="index.html">决策台</a>
+    <a href="sector.html">板块热度</a>
+    <a href="news.html">资讯雷达</a>
+    <a href="theory.html">真实思想</a>
+    <a href="skills.html" class="active">Skill 图解</a>
+    <a href="backtest.html">回测验证</a>
+    <a href="system.html">系统完善</a>
+  </div>
+</div></nav>
+
+<div class="hero"><div class="hero-inner">
+  <span class="eyebrow">Playbook · 模式库</span>
+  <h1>Skill 蒸馏图解 · 六大模式K线实例</h1>
+  <p>每个 Playbook 模式：来源 → 蒸馏要点 → 图标 → K线示意图 → 实战要点。传统投机方法的完整拆解，量化仅用于验证规则。</p>
+  <span class="badge">一手经典 → 规则化 → 回测验证 → 分层打包</span>
+</div></div>
+
+<div class="wrap">
+  <div class="card">
+    <h2>一、这个 Skill 是怎么"蒸馏"出来的（六步流程）</h2>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><b>选源</b><br>只取一手经典：《股票作手回忆录》《股票大作手操盘术》（利弗莫尔）、《金融炼金术》（索罗斯）、《交易心理分析》（道格拉斯）。</div>
+      <div class="step"><div class="n">2</div><b>语料拆解</b><br>按"哲学/规则/案例/教训"四类归类，≥2处出现的规则才保留（抗孤证）。</div>
+      <div class="step"><div class="n">3</div><b>概念提取</b><br>最小阻力线、关键点、金字塔加仓、反身性、谬误性、假设-证伪。</div>
+      <div class="step"><div class="n">4</div><b>规则化</b><br>"等确认"→20日新高+放量；"不摊平"→硬编码止损单。</div>
+      <div class="step"><div class="n">5</div><b>回测验证</b><br>可指数化规则用三大指数真实日线验证（次日开盘成交、含成本、SHA-256校验）。</div>
+      <div class="step"><div class="n">6</div><b>分层打包</b><br>哲学→模式→执行→风控→案例五层，SKILL.md + 网页闭环。</div>
+    </div>
+    <div class="note"><b>蒸馏的取舍原则：</b>两位大师矛盾之处（利弗莫尔重趋势延续 vs 索罗斯抓拐点）不强行统一，而是按市场状态分调度——趋势期用利弗莫尔，衰竭期用索罗斯。<b>破产记录与失败案例同列为一级蒸馏物</b>（利弗莫尔死于不执行规则，而非规则错误）。<b>本页规则是对原文思想的量化近似——原始概念的真实内涵（如"最小阻力线"的本义）与 A股应用，见「真实思想」页。</b></div>
+  </div>
+
+  <div class="card">
+    <h2>二、六大模式（Skill）逐个图解</h2>
+    <p class="small" style="margin-bottom:14px">K线图为<b>构造的教学示意图</b>（非个别真实股票），用于展示形态结构；真实数据统计验证见回测页。</p>
+    <div id="patterns"></div>
+  </div>
+
+  <div class="card">
+    <h2>三、引入的具体历史数据与策略来源</h2>
+    <h3>数据（真实、可复现，页面内 SHA-256 校验）</h3>
+    <table>
+      <tr><th>数据</th><th>来源</th><th>范围</th><th>获取方式</th></tr>
+      <tr><td>上证综指日线</td><td>新浪财经 CN_MarketDataService（sh000001）</td><td>2020-06-24 → 2026-08-28（1500根）</td><td>fetch_all.js 一键重下</td></tr>
+      <tr><td>恒生指数日线</td><td>腾讯证券 web.ifzq.gtimg.cn（hkHSI）</td><td>2018-07-17 → 2026-08-28（2000根）</td><td>同上</td></tr>
+      <tr><td>标普500日线</td><td>腾讯证券 web.ifzq.gtimg.cn（us.INX）</td><td>2018-09-13 → 2026-08-28（2000根）</td><td>同上</td></tr>
+    </table>
+    <h3>策略（全部可溯源到公开出版物）</h3>
+    <table>
+      <tr><th>模式</th><th>原始出处</th><th>原文依据（大意）</th></tr>
+      <tr><td>P1/P2 趋势+关键点</td><td>《股票大作手操盘术》第4-7章</td><td>"价格沿最小阻力线运动；等关键点突破确认后行动"</td></tr>
+      <tr><td>P3 反身性加速</td><td>《金融炼金术》第1-3章</td><td>"参与者认知与现实互相作用形成正/负反馈环"</td></tr>
+      <tr><td>P4 泡沫拐点</td><td>索罗斯1992做空英镑（公开访谈/传记）</td><td>"失衡+工具耗尽+负反馈事件，三者齐备才全力一击"</td></tr>
+      <tr><td>P5 恐慌错杀</td><td>《股票作手回忆录》+威廉姆斯超卖研究</td><td>"市场不会永远跌；但必须恐慌后企稳确认"</td></tr>
+      <tr><td>P6 龙头跟随</td><td>《股票大作手操盘术》板块论</td><td>"板块运动是交易的基本单位，龙头先涨且涨最多"</td></tr>
+      <tr><td>风控与心理层</td><td>利弗莫尔破产史+《交易心理分析》</td><td>"亏损头寸砍掉盈利头寸保留"</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>四、如何用这套东西指导选股与投资（每日方法论）</h2>
+    <ol class="flow">
+      <li><b>开盘前（10分钟）</b>：决策台「市场诊断」→ 得到市场状态与<b>总仓位上限</b>。上限=20%时再好的股票也只能用20%仓，这一步挡掉80%的亏损。</li>
+      <li><b>选股</b>：健康趋势+热点市场优先 P6→P1→P2 候选：当日板块≥2只大涨/涨停的共振板块中，挑<b>最先涨停、量能最大、逻辑最硬</b>的龙头，或创20日新高且放量的强趋势股，填入「选股筛选器」验证，不符合=放弃。</li>
+      <li><b>开仓前</b>：「60秒清单」7问全过。核心三问：模式编号？一句话假设与证伪条件？止损位与2%风险仓位？</li>
+      <li><b>持仓中</b>：每天只验证一句话假设。P6看龙头是否让位，P1/P2看是否跌破20日线两日，P3看量增价滞。</li>
+      <li><b>离场后</b>：当天记入「交易日志」。月底看<b>规则遵守率</b>（>90%才是真正的成绩单）与<b>每笔期望值</b>（负期望模式连续10笔淘汰）。</li>
+      <li><b>风控总闸</b>：回撤10%减半仓、15%强制空仓两周；单笔≤2%；不加杠杆；连亏3笔休市2天。</li>
+      <li><b>定期验证</b>：回测页重跑三大指数+自选股CSV，确认模式在你交易的市场仍有统计优势。</li>
+    </ol>
+    <div class="note"><b>可复制性保证：</b>① 信号规则参数化且公开（无黑箱）；② 数据公开+脚本一键重下+SHA-256防篡改；③ 日志与回测同一套模式编号，形成"假设→执行→统计→淘汰"闭环；④ 回测次日开盘成交、含摩擦成本，不夸大。</div>
+  </div>
+
+  <div class="disclaimer">⚠️ 教学与研究用途，不构成投资建议。K线示意图为构造的教学样本；回测基于指数历史数据，过去表现不代表未来。两位大师均多次破产——请永远先执行风控铁律。</div>
+</div>
+
+<script>
+function drawK(id, bars, notes){
+  const cv=document.getElementById(id);const dpr=window.devicePixelRatio||1;
+  const W=cv.clientWidth,H=cv.getAttribute("height")*1;
+  cv.width=W*dpr;cv.height=H*dpr;cv.style.height=H+"px";
+  const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+  const P={l:8,r:8,t:18,b:26};
+  let mn=Infinity,mx=-Infinity;bars.forEach(b=>{mn=Math.min(mn,b.l);mx=Math.max(mx,b.h);});
+  const pad=(mx-mn)*0.08;mn-=pad;mx+=pad;
+  const n=bars.length,bw=(W-P.l-P.r)/n;
+  const Y=v=>P.t+(H-P.t-P.b)*(1-(v-mn)/(mx-mn));
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="#94a3b8";ctx.font="10px sans-serif";
+  bars.forEach((b,i)=>{if(b.label)ctx.fillText(b.label,P.l+bw*i+bw/2-16,H-8);});
+  bars.forEach((b,i)=>{
+    const x=P.l+bw*i+bw/2,up=b.c>=b.o;
+    ctx.strokeStyle=up?"#34d399":"#f87171";ctx.fillStyle=ctx.strokeStyle;
+    ctx.lineWidth=1.2;
+    ctx.beginPath();ctx.moveTo(x,Y(b.h));ctx.lineTo(x,Y(b.l));ctx.stroke();
+    const bwid=Math.max(3,bw*0.6),yo=Y(b.o),yc=Y(b.c);
+    ctx.fillRect(x-bwid/2,Math.min(yo,yc),bwid,Math.max(1,Math.abs(yc-yo)));
+  });
+  notes.forEach(nt=>{
+    const i=nt.i,x=P.l+bw*i+bw/2,y=Y(nt.p);
+    ctx.fillStyle=nt.color;
+    if(nt.type==="b"){ctx.beginPath();ctx.moveTo(x,y-16);ctx.lineTo(x-6,y-7);ctx.lineTo(x+6,y-7);ctx.closePath();ctx.fill();}
+    else if(nt.type==="s"){ctx.beginPath();ctx.moveTo(x,y+16);ctx.lineTo(x-6,y+7);ctx.lineTo(x+6,y+7);ctx.closePath();ctx.fill();}
+    else if(nt.type==="line"){ctx.strokeStyle=nt.color;ctx.setLineDash(nt.dash||[5,4]);ctx.beginPath();ctx.moveTo(P.l+nt.i1*bw+bw/2,Y(nt.p));ctx.lineTo(P.l+nt.i2*bw+bw/2,Y(nt.p));ctx.stroke();ctx.setLineDash([]);}
+    if(nt.text){ctx.font="bold 11px sans-serif";ctx.fillText(nt.text,x-16,y+(nt.type==="s"?-18:24));}
+  });
+}
+function bar(o,c,h,l,label){return{o,c,h,l,label}}
+const D=[
+{ icon:"🚀",bg:"rgba(52,211,153,.15)",name:"P1 平台突破 · 最小阻力线",src:"利弗莫尔《股票大作手操盘术》",
+ traits:["顺势而为，绝不摸顶抄底","突破≥10日平台+20日新高+放量才进场","止损：跌回平台或-5%","首仓25%，浮盈后金字塔加仓"],
+ bars:[bar(10,10.2,10.3,9.9),bar(10.2,10.1,10.4,10.0),bar(10.1,10.3,10.4,10.05),bar(10.3,10.2,10.5,10.1),bar(10.2,10.4,10.5,10.15),bar(10.4,10.3,10.55,10.2),bar(10.3,10.35,10.5,10.25),bar(10.35,10.6,10.8,10.3,"突破日"),bar(10.7,11.2,11.4,10.6),bar(11.1,11.5,11.7,11.0),bar(11.5,11.3,11.8,11.1),bar(11.3,11.8,12.1,11.2),bar(11.8,12.3,12.5,11.7),bar(12.3,12.0,12.6,11.9)],
+ notes:[{i:7,type:"b",p:10.6,text:"▲放量买入"},{i:7,type:"line",i1:0,i2:7,p:10.55,color:"#fbbf24",text:"平台顶=关键点"},
+        {i:13,type:"s",p:12.0,text:"▼跌破20日线卖"}],kl:"特征：横盘→放量突破→趋势延续。缩量跌回平台=假突破，无条件走。"},
+{ icon:"🎯",bg:"rgba(96,165,250,.15)",name:"P2 关键点回踩确认",src:"利弗莫尔 Pivotal Point",
+ traits:["比追突破盈亏比更好","回踩至突破位±2%且缩量企稳才买","止损：有效跌破关键点3%","放量击穿=失效"],
+ bars:[bar(10,10.5,10.6,9.9),bar(10.5,10.8,11.0,10.4),bar(10.8,11.3,11.5,10.7,"突破"),bar(11.3,11.0,11.4,10.9),bar(11.0,10.75,11.05,10.6),bar(10.75,10.8,10.9,10.65,"回踩缩量"),bar(10.8,11.2,11.3,10.75),bar(11.2,11.6,11.8,11.1),bar(11.6,12.0,12.2,11.5),bar(12.0,12.4,12.6,11.9)],
+ notes:[{i:5,type:"b",p:10.65,text:"▲缩量回踩买"},{i:2,type:"line",i1:0,i2:9,p:11.5,color:"#60a5fa",text:"关键点"},
+        {i:5,type:"line",i1:2,i2:9,p:10.6,color:"#f87171",dash:[3,3],text:"止损-3%"}],kl:"特征：突破后首次回踩不破关键点=趋势确认。"},
+{ icon:"🌀",bg:"rgba(167,139,250,.15)",name:"P3 反身性加速段",src:"索罗斯《金融炼金术》",
+ traits:["正反馈环：价升→叙事→资金→价升","只做加速初段（第一根放量长阳后）","衰竭信号：量增价滞/龙头补跌/利好不涨","任一衰竭信号=离场，不等止损"],
+ bars:[bar(10,10.3,10.4,9.9),bar(10.3,10.6,10.7,10.2),bar(10.6,10.5,10.9,10.4),bar(10.5,10.9,11.0,10.4),bar(10.9,11.4,11.6,10.8,"放量长阳"),bar(11.4,11.9,12.2,11.3),bar(11.9,12.3,12.7,11.8),bar(12.3,12.2,12.9,12.0,"量增价滞"),bar(12.2,11.8,12.4,11.6),bar(11.8,11.2,11.9,11.0)],
+ notes:[{i:4,type:"b",p:11.6,text:"▲初段跟进"},{i:7,type:"s",p:12.2,text:"▼量增价滞即离场"}],kl:"特征：加速上行→巨量滞涨=反馈环衰竭。绝不做末段。"},
+{ icon:"🫧",bg:"rgba(248,113,113,.15)",name:"P4 泡沫拐点 · 索罗斯三条件",src:"索罗斯1992做空英镑",
+ traits:["三条件齐备才行动：极值+工具耗尽+首现负反馈","A股/港股应用=系统性清仓（降仓≤20%）","判断错（市场新高）=承认并恢复规则","回测映射：>MA200×1.25收紧离场线"],
+ bars:[bar(10,10.8,11.0,10.5),bar(10.8,11.6,11.8,10.7),bar(11.6,12.5,12.8,11.5),bar(12.5,13.5,13.9,12.4,"极值区"),bar(13.5,14.2,14.8,13.3),bar(14.2,14.0,14.9,13.8,"利好不涨"),bar(14.0,13.2,14.1,13.0,"首现长阴"),bar(13.2,12.3,13.3,12.0),bar(12.3,11.4,12.4,11.0)],
+ notes:[{i:6,type:"s",p:13.2,text:"▼三条件齐备清仓"},{i:3,type:"line",i1:0,i2:8,p:13.9,color:"#fbbf24",text:"MA200×1.25极值线"}],kl:"特征：疯狂冲顶→利好不涨→首根放量长阴。1992英镑、1929美股同构。"},
+{ icon:"🌧️",bg:"rgba(251,191,36,.15)",name:"P5 恐慌错杀反弹",src:"利弗莫尔+威廉姆斯超卖研究",
+ traits:["前提：大盘恐慌性长阴（单日≤-3%）","次日缩量止跌企稳才买，绝不接飞刀","只买恐慌前的强趋势股","目标+8%或5日线了结——短线不是抄底"],
+ bars:[bar(10,9.7,10.1,9.5),bar(9.7,9.2,9.8,9.0),bar(9.2,8.4,9.3,8.2,"恐慌长阴-3%"),bar(8.4,8.6,8.7,8.35,"缩量止跌"),bar(8.6,9.0,9.1,8.5),bar(9.0,9.4,9.6,8.9),bar(9.4,9.2,9.7,9.1),bar(9.2,9.0,9.3,8.8,"5日线了结")],
+ notes:[{i:3,type:"b",p:8.35,text:"▲企稳确认买"},{i:2,type:"line",i1:0,i2:7,p:8.2,color:"#f87171",dash:[3,3],text:"止损=恐慌日低点"},
+        {i:6,type:"s",p:9.2,text:"▼到价即走"}],kl:"特征：暴跌→缩量十字/小阳→技术性反弹。小仓快进快出。"},
+{ icon:"👑",bg:"rgba(52,211,153,.15)",name:"P6 龙头跟随 · 板块共振",src:"利弗莫尔板块论",
+ traits:["板块≥2只大涨/涨停=共振日","只选最强：最先涨停/量最大/逻辑最硬","退潮信号：旧龙头滞涨+新龙头出现","板块退潮=全部离场，不恋战"],
+ bars:[bar(10,10.2,10.3,9.9),bar(10.2,10.5,10.6,10.1),bar(10.5,10.6,10.8,10.4),bar(10.6,11.1,11.2,10.55,"板块共振日"),bar(11.1,11.7,11.9,11.0),bar(11.7,12.2,12.4,11.6),bar(12.2,12.0,12.5,11.8,"龙头滞涨"),bar(12.0,11.5,12.1,11.3),bar(11.5,10.9,11.6,10.7)],
+ notes:[{i:3,type:"b",p:11.2,text:"▲共振日买龙头"},{i:6,type:"s",p:12.0,text:"▼让位即离场"}],kl:"特征：板块共振→龙头领涨→龙头让位=行情结束。"}];
+document.getElementById("patterns").innerHTML=D.map((d,i)=>`
+<div class="pbox">
+  <div class="head"><div class="icon" style="background:${d.bg}">${d.icon}</div>
+    <div><div class="pname">${d.name}</div><div class="psrc">蒸馏自：${d.src}</div></div></div>
+  <div>${d.traits.map(t=>`<span class="tag t-green">${t}</span>`).join("")}</div>
+  <canvas id="k${i}" height="230" style="margin-top:12px"></canvas>
+  <div class="klabel">📐 ${d.kl}</div>
+</div>`).join("");
+window.addEventListener("load",()=>D.forEach((d,i)=>drawK("k"+i,d.bars,d.notes)));
+window.addEventListener("resize",()=>D.forEach((d,i)=>drawK("k"+i,d.bars,d.notes)));
+</script>
+</body>
+</html>

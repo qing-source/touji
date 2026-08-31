@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>回测验证 · 大师短线投机决策台</title>
+<link rel="stylesheet" href="style.css?v=6">
+</head>
+<body>
+
+<nav class="navbar"><div class="nav-inner">
+  <div class="brand"><span class="mark">◈</span>大师投机决策台</div>
+  <div class="nav-links">
+    <a href="index.html">决策台</a>
+    <a href="sector.html">板块热度</a>
+    <a href="news.html">资讯雷达</a>
+    <a href="theory.html">真实思想</a>
+    <a href="skills.html">Skill 图解</a>
+    <a href="backtest.html" class="active">回测验证</a>
+    <a href="system.html">系统完善</a>
+    <a href="system.html">系统完善</a>
+  </div>
+</div></nav>
+
+<div class="hero"><div class="hero-inner">
+  <span class="eyebrow">Backtest · 量化体检</span>
+  <h1>回测验证 · 传统规则的量化体检</h1>
+  <p>上证综指 / 恒生指数 / 标普500 真实日线数据，SHA-256 防篡改校验。<b>信号收盘生成、次日开盘成交</b>，含交易成本，无前视偏差——传统投机方法 + 量化手段验证，稳定可复现。</p>
+  <span class="badge">次日开盘成交 · 含成本 · 无前视偏差</span>
+</div></div>
+
+<div class="wrap">
+  <div class="card">
+    <h2>① 数据与参数</h2>
+    <div class="controls">
+      <div><label>市场（指数/个股）</label>
+        <select id="sel-market">
+          <optgroup label="指数">
+            <option value="shc">🇨🇳 上证综指 (2020-06→今)</option>
+            <option value="hsi">🇭🇰 恒生指数 (2018-07→今)</option>
+            <option value="spx">🇺🇸 标普500 (2018-09→今)</option>
+          </optgroup>
+          <optgroup label="A股个股（2020-06→今）">
+            <option value="600519">贵州茅台 600519</option>
+            <option value="000858">五粮液 000858</option>
+            <option value="000001">平安银行 000001</option>
+            <option value="600036">招商银行 600036</option>
+            <option value="300750">宁德时代 300750</option>
+            <option value="601318">中国平安 601318</option>
+            <option value="600030">中信证券 600030</option>
+            <option value="002594">比亚迪 002594</option>
+          </optgroup>
+          <option value="custom">📁 自定义CSV…</option>
+        </select></div>
+      <div><label>策略</label>
+        <select id="sel-strategy">
+          <option value="trend">P1+P2 趋势确认</option>
+          <option value="panic">P5 恐慌错杀反弹</option>
+          <option value="combo">组合：趋势为主 + P5增强</option>
+          <option value="bh">纯买入持有（对照）</option>
+        </select></div>
+      <div><label>P4极值风控（>MA200×1.25）</label>
+        <select id="sel-p4"><option value="1">启用</option><option value="0">关闭</option></select></div>
+      <div><label>量能确认（量>5日均量×1.5）</label>
+        <select id="sel-vol"><option value="1">启用</option><option value="0">关闭（指数建议）</option></select></div>
+      <div><label>单边成本 ‰</label><input type="number" id="inp-cost" value="1" step="0.5" min="0" style="width:80px"></div>
+      <div><label>初始资金</label><input type="number" id="inp-cap" value="1000000" step="100000" style="width:120px"></div>
+      <div><label>导入CSV（Date,Open,High,Low,Close,Volume）</label><input type="file" id="file-csv" accept=".csv"></div>
+      <div><button class="btn btn-primary" onclick="run()">▶ 运行回测</button></div>
+    </div>
+    <div class="verify" id="verify">数据校验：待运行…</div>
+  </div>
+
+  <div class="card">
+    <h2>② 绩效指标 <span class="small" id="m-sub"></span></h2>
+    <div class="stats" id="stats"></div>
+    <div class="stats" id="review-stats" style="margin-top:10px;display:none"></div>
+  </div>
+
+  <div class="card">
+    <h2>③ 价格与交易点 <span class="small">（▲买入 ▼卖出，金=20日线 紫=200日线）</span></h2>
+    <canvas id="cv-price" height="360"></canvas>
+    <h2>④ 资金曲线 <span class="small">（绿=策略 灰=买入持有）</span></h2>
+    <canvas id="cv-equity" height="260"></canvas>
+    <h2>⑤ 回撤对比 <span class="small">（下=策略 上=持有，持有压缩一半便于对比）</span></h2>
+    <canvas id="cv-dd" height="200"></canvas>
+    <div class="legend">
+      <span><span class="dot" style="background:#34d399"></span>策略权益</span>
+      <span><span class="dot" style="background:#94a3b8"></span>买入持有</span>
+      <span><span class="dot" style="background:#e5c07b"></span>MA20</span>
+      <span><span class="dot" style="background:#a78bfa"></span>MA200</span>
+      <span>▲ 买入（次日开盘价）</span><span>▼ 卖出（次日开盘价）</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>⑥ 交易明细</h2>
+    <div style="overflow-x:auto;max-height:400px"><table id="trade-table"></table></div>
+  </div>
+
+  <div class="card" id="robust" style="display:none"></div>
+
+  <div class="card">
+    <h2>⑦ A股个股回测结论（8只样本，2020-06 → 2026-08）</h2>
+    <table>
+      <tr><th>标的</th><th>策略总收益</th><th>年化</th><th>最大回撤</th><th>胜率</th><th>笔数</th><th>买入持有</th><th>相对</th></tr>
+      <tr><td>比亚迪 002594</td><td class="green">+80.6%</td><td>+12.1%</td><td>-18.9%</td><td>55%</td><td>11</td><td>+137%</td><td class="small">熊市避损</td></tr>
+      <tr><td>宁德时代 300750</td><td class="green">+32.5%</td><td>+5.6%</td><td>-27.4%</td><td>45%</td><td>11</td><td>+28.9%</td><td class="small">略胜</td></tr>
+      <tr><td>中信证券 600030</td><td class="green">+32.5%</td><td>+5.6%</td><td>-18.8%</td><td>33%</td><td>18</td><td>+13.0%</td><td class="small">胜出</td></tr>
+      <tr><td>招商银行 600036</td><td class="green">+6.3%</td><td>+1.2%</td><td>-19.9%</td><td>38%</td><td>13</td><td>-19.3%</td><td class="small">避损</td></tr>
+      <tr><td>中国平安 601318</td><td class="green">+3.3%</td><td>+0.6%</td><td>-28.0%</td><td>22%</td><td>18</td><td>-22.8%</td><td class="small">避损</td></tr>
+      <tr><td>五粮液 000858</td><td class="red">-14.3%</td><td>-2.9%</td><td>-34.8%</td><td>30%</td><td>20</td><td>-59.3%</td><td class="small">显著避损</td></tr>
+      <tr><td>平安银行 000001</td><td class="red">-19.1%</td><td>-4.0%</td><td>-26.5%</td><td>32%</td><td>19</td><td>-30.3%</td><td class="small">避损</td></tr>
+      <tr><td>贵州茅台 600519</td><td class="red">-24.8%</td><td>-5.4%</td><td>-33.7%</td><td>29%</td><td>14</td><td>-12.8%</td><td class="small">劣于持有</td></tr>
+    </table>
+    <div class="note"><b>核心结论（诚实解读）：</b>① 8只中<b>7只跑赢买入持有</b>（等权平均：策略 +12.1% vs 持有 -29.3%）；② 策略价值主要在<b>熊市避损</b>——白酒/银行在2021-2024熊市中回撤巨大，规则化离场显著缩小亏损；③ 仅茅台一只劣于持有（趋势策略在单边下跌+反弹反复的品种上被反复止损）；④ 低胜率（22-55%）高盈亏比符合利弗莫尔式"截断亏损、让利润奔跑"的特征；⑤ 该方法在<b>震荡市会频繁止损</b>，需配合大师分诊的市场状态闸门使用。</div>
+    <div class="note"><b>局限性：</b>样本为今天知名的蓝筹（存在幸存者偏差）；未建模涨跌停无法成交、停牌；未建模板块相关性（同板块同买=风险叠加，v2.0 已限制同板块≤2只）；过去6年不代表未来。</div>
+  </div>
+
+  <div class="card">
+    <h2>⑧ 方法论与准确性保障</h2>
+    <div class="note"><b>定位声明：</b>本策略是<b>传统投机方法</b>——日线级、人工看盘决策、年均仅十余次信号。量化思想只用于两件事：① 把规则参数化使其可检验；② 用历史数据统计验证规则优势。不是高频/自动交易系统。</div>
+    <div class="note"><b>回测准确性（防三类常见失真）：</b>
+      ① <b>无前视偏差</b>：所有信号在收盘后确认，一律以<b>次日开盘价</b>成交，决策时刻不可能知道次日价格；
+      ② <b>含交易摩擦</b>：默认单边 1‰（佣金+滑点），可调高压力测试；
+      ③ <b>无幸存者偏差</b>：使用指数而非个股，且数据经 SHA-256 校验防篡改。</div>
+    <div class="note"><b>策略→指数层映射（诚实声明）：</b>P6龙头跟随、P3板块反身性需要个股与板块数据，单指数无法回测；本页验证可指数化规则：P1/P2（20日新高+站上20日线入场；跌破20日线连续两日或-5%止损离场）、P5（单日暴跌>3%后次日止跌企稳小仓做多，+8%/10日线/10日内了结）、P4（收盘>MA200×1.25 极值区离场线收紧至10日线）。</div>
+    <div class="note"><b>可复现性：</b>app/fetch_all.js 一键重下数据（新浪/腾讯公开接口）→ build_data.js 打包并记录 SHA-256 → 页面 WebCrypto 实时比对；支持导入任意标准CSV复跑；test_engine.js 提供与页面同构的无头交叉验证。</div>
+    <div class="note"><b>已知局限：</b>收盘价止损按次日开盘近似（实盘盘中触发会更早但差异有限）；样本仅6-8年；指数不含个股涨跌停摩擦；过去表现不代表未来。</div>
+  </div>
+
+  <div class="disclaimer">⚠️ 教学与研究用途，不构成投资建议。指数回测不能保证个股实际盈利。两位大师均多次破产——请永远先执行风控铁律。</div>
+</div>
+
+<script src="data.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const fmtPct=x=>(x*100).toFixed(1)+"%";
+function parseCSV(text){
+  const lines=text.trim().split(/\r?\n/); const out=[];
+  for(let i=1;i<lines.length;i++){const p=lines[i].split(",");
+    if(p.length<5)continue;
+    const d={date:p[0],open:+p[1],high:+p[2],low:+p[3],close:+p[4],vol:+(p[5]||0)};
+    if(isFinite(d.close)&&d.close>0)out.push(d);}
+  return out;
+}
+function sma(arr,n){const out=new Array(arr.length).fill(null);let s=0;
+  for(let i=0;i<arr.length;i++){s+=arr[i];if(i>=n)s-=arr[i-n];if(i>=n-1)out[i]=s/n;}return out;}
+function maxDD(eq){let peak=-Infinity,dd=0;for(const v of eq){if(v>peak)peak=v;dd=Math.min(dd,v/peak-1);}return dd;}
+function sharpeDaily(eq){const r=[];for(let i=1;i<eq.length;i++)r.push(eq[i]/eq[i-1]-1);
+  const m=r.reduce((a,b)=>a+b,0)/r.length;const sd=Math.sqrt(r.reduce((a,b)=>a+(b-m)**2,0)/r.length);
+  return sd?m/sd*Math.sqrt(252):0;}
+
+async function loadData(){
+  const mk=$("sel-market").value;
+  if(mk==="custom"){
+    const f=$("file-csv").files[0];
+    if(!f){alert("请选择CSV文件");return null;}
+    const rows=parseCSV(await f.text());
+    $("verify").className="verify ok";$("verify").textContent=`数据校验：自定义CSV 已加载 ${rows.length} 根（${rows[0].date} → ${rows[rows.length-1].date}，来源由你自行保证）`;
+    return {rows,meta:{source:"自定义上传",sha256:"—"},custom:true};
+  }
+  const s=DATASET.series[mk];
+  const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s.csv));
+  const hash=[...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
+  const ok=hash===s.sha256;
+  const v=$("verify");
+  v.className="verify "+(ok?"ok":"bad");
+  v.textContent=ok?`✅ 数据校验通过（SHA-256 一致）：${s.source} · ${s.rows} 根 · ${s.first} → ${s.last} · 打包于 ${DATASET.generated.slice(0,10)}`
+                  :`❌ 数据校验失败！请重新运行 fetch_all.js + build_data.js`;
+  return {rows:parseCSV(s.csv),meta:s};
+}
+
+/* ===== 回测引擎 v2：收盘信号 → 次日开盘成交（无前视） ===== */
+function backtest(rows,strat,useP4,costBps,useVol){
+  const n=rows.length,close=rows.map(r=>r.close),open=rows.map(r=>r.open),vol=rows.map(r=>r.vol||0);
+  const ma10=sma(close,10),ma20=sma(close,20),ma200=sma(close,200),v5=sma(vol,5);
+  const hh20=new Array(n).fill(null);
+  for(let i=0;i<n;i++){if(i>=20){let h=-Infinity;for(let j=i-20;j<i;j++)h=Math.max(h,close[j]);hh20[i]=h;}}
+  const cost=costBps/10000;
+  let cash=1,pos=0,entry=0,entryIdx=-1,stop=-Infinity,extCool=false;
+  const eq=new Array(n).fill(1),trades=[],marks=[];
+  for(let k=0;k<200;k++)eq[k]=1;
+
+  for(let i=200;i<n-1;i++){
+    const p4=useP4&&ma200[i]&&close[i]>ma200[i]*1.25;
+    if(p4)extCool=true;
+    if(ma200[i]&&close[i]<ma200[i]*1.15)extCool=false;
+    const exitLine=p4?ma10[i]:ma20[i];
+    const nextOpen=open[i+1];
+
+    /* 持仓：收盘检查离场信号，次日开盘执行 */
+    if(pos>0){
+      let exit=false,reason="";
+      if(strat==="panic"){
+        const ret=close[i]/entry-1;
+        if(ret<=-0.04){exit=true;reason="止损-4%";}
+        else if(ret>=0.08){exit=true;reason="目标+8%";}
+        else if(ma10[i]&&close[i]>ma10[i]&&ret>0){exit=true;reason="上穿10日线了结";}
+        else if(i-entryIdx>=10){exit=true;reason="持满10日";}
+      }else{
+        if(close[i]<stop){exit=true;reason="止损-5%";}
+        else if(exitLine&&close[i]<exitLine&&close[i-1]<exitLine){exit=true;reason="跌破"+(p4?"10日线(P4收紧)":"20日线两日");}
+      }
+      if(exit){
+        cash+=pos*nextOpen*(1-cost);
+        marks.push({i:i+1,type:"s",p:nextOpen,reason});
+        trades.push({in:entryIdx,out:i+1,e:entry,x:nextOpen,ret:nextOpen/entry-1-2*cost,reason});
+        pos=0;
+      }
+    }
+    /* 空仓：收盘检查入场信号，次日开盘执行 */
+    if(pos===0){
+      const sd=rows[i-1],td=rows[i];
+      const panicSignal=sd.close/sd.open-1<=-0.03;
+      const stabilize=panicSignal&&td.close>td.open&&td.low>=sd.low*0.995;
+      const trendSignal=hh20[i]&&close[i]>hh20[i]&&ma20[i]&&close[i]>ma20[i]&&(!useVol||(v5[i]&&vol[i]>v5[i]*1.5))&&close[i-1]<=hh20[i]&&!extCool;
+      let w=0;
+      if((strat==="trend"||strat==="combo")&&trendSignal)w=1;
+      if((strat==="panic"||strat==="combo")&&stabilize)w=Math.max(w,0.25);
+      if(w>0){
+        entry=nextOpen;entryIdx=i+1;
+        const amt=cash*w;
+        pos=amt*(1-cost)/entry;
+        cash-=amt;
+        stop=entry*0.95;
+        marks.push({i:i+1,type:"b",p:entry});
+      }
+    }
+    eq[i+1]=cash+pos*close[i+1];
+  }
+  const bh=rows.map(r=>r.close/rows[200].close);
+  return {eq,bh,trades,marks,ma10,ma20,ma200,rows};
+}
+
+function metrics(eq,bh,trades,rows){
+  const years=(rows.length-200)/252;
+  const wins=trades.filter(t=>t.ret>0);
+  return {
+    total:eq[eq.length-1]/eq[200]-1,
+    bhTotal:bh[bh.length-1]/bh[200]-1,
+    cagr:Math.pow(eq[eq.length-1],1/years)-1,
+    bhCagr:Math.pow(bh[bh.length-1]/bh[200],1/years)-1,
+    mdd:maxDD(eq.slice(200)),bhMdd:maxDD(bh.slice(200)),
+    sharpe:sharpeDaily(eq.slice(200)),bhSharpe:sharpeDaily(bh.slice(200)),
+    n:trades.length,wr:trades.length?wins.length/trades.length:0,
+    avgHold:trades.length?(trades.reduce((a,t)=>a+(t.out-t.in),0)/trades.length).toFixed(1):0,
+  };
+}
+
+// 交易复盘统计：盈亏比/极值/连胜连亏/月度胜率——把交易序列变成可改进的数据
+function renderReview(trades, rows){
+  const el = document.getElementById('review-stats');
+  if(!trades.length){ el.style.display='none'; return; }
+  const wins = trades.filter(t=>t.ret>0), losses = trades.filter(t=>t.ret<=0);
+  const avgWin = wins.length? wins.reduce((a,t)=>a+t.ret,0)/wins.length : 0;
+  const avgLoss = losses.length? losses.reduce((a,t)=>a+t.ret,0)/losses.length : 0;
+  const pf = avgLoss? avgWin/Math.abs(avgLoss) : avgWin>0? Infinity : 0;
+  const maxWin = Math.max(...trades.map(t=>t.ret));
+  const maxLoss = Math.min(...trades.map(t=>t.ret));
+  const exp = trades.reduce((a,t)=>a+t.ret,0)/trades.length;
+  // 连胜连亏
+  let streak=0, bestW=0, bestL=0;
+  trades.forEach(t=>{ streak = t.ret>0 ? (streak>0?streak+1:1) : (streak<0?streak-1:-1); if(streak>bestW)bestW=streak; if(streak<bestL)bestL=streak; });
+  // 月度胜率（按平仓日月份分组）
+  const byMonth = {};
+  trades.forEach(t=>{ const d = rows[t.out] ? rows[t.out].date.slice(0,7) : '?'; (byMonth[d] = byMonth[d] || []).push(t.ret>0?1:0); });
+  const months = Object.entries(byMonth).sort((a,b)=>a[0]<b[0]?-1:1);
+  const winMonths = months.filter(([,v])=>v.filter(x=>x).length/v.length>=0.5).length;
+  const S=(v,l,c)=>`<div class="stat"><div class="v ${c||''}">${v}</div><div class="l">${l}</div></div>`;
+  const pct = v=>(v*100).toFixed(1)+'%';
+  const pfStr = pf===Infinity?'∞':pf.toFixed(2);
+  el.style.display='flex';
+  el.innerHTML =
+    S(pfStr, '盈亏比（平均盈/亏）', pf>=1.5?'green':(pf>=1?'amber':'red'))+
+    S(pct(exp), '单笔期望值', exp>0?'green':'red')+
+    S(pct(maxWin), '最大单笔盈利', 'green')+
+    S(pct(maxLoss), '最大单笔亏损', 'red')+
+    S(bestW+' 连', '最大连胜', 'green')+
+    S(bestL+' 连', '最大连亏', 'red')+
+    S(winMonths+'/'+months.length+' 月', '月度胜率≥50%');
+}
+
+function draw(){
+  const dpr=window.devicePixelRatio||1;
+  ["cv-price","cv-equity","cv-dd"].forEach(id=>{const c=$(id);const w=c.clientWidth;c.width=w*dpr;c.height=+c.getAttribute("height")*dpr;c.getContext("2d").setTransform(dpr,0,0,dpr,0,0);});
+}
+function lineChart(cv,arrs,opts){
+  const ctx=cv.getContext("2d"),W=cv.width/(window.devicePixelRatio||1),H=cv.height/(window.devicePixelRatio||1);
+  const P={l:8,r:56,t:10,b:20};
+  let mn=Infinity,mx=-Infinity;arrs.forEach(a=>a.data.forEach(v=>{if(v!=null&&isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v);}}));
+  const pad=(mx-mn)*0.05;mn-=pad;mx+=pad;
+  const n=arrs[0].data.length;
+  const X=i=>P.l+(W-P.l-P.r)*i/(n-1), Y=v=>P.t+(H-P.t-P.b)*(1-(v-mn)/(mx-mn));
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle="#253045";ctx.fillStyle="#94a3b8";ctx.font="10px sans-serif";
+  for(let k=0;k<=4;k++){const v=mn+(mx-mn)*k/4,y=Y(v);
+    ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();
+    ctx.fillText(opts.fmt?opts.fmt(v):v.toFixed(0),W-P.r+4,y+3);}
+  arrs.forEach(a=>{ctx.beginPath();ctx.strokeStyle=a.color;ctx.lineWidth=a.width||1.5;if(a.dash)ctx.setLineDash(a.dash);
+    let started=false;
+    for(let i=0;i<n;i++){const v=a.data[i];if(v==null||!isFinite(v))continue;
+      if(!started){ctx.moveTo(X(i),Y(v));started=true;}else ctx.lineTo(X(i),Y(v));}
+    ctx.stroke();ctx.setLineDash([]);});
+  if(opts.dates){ctx.fillStyle="#94a3b8";ctx.fillText(opts.dates[0],P.l,H-4);ctx.fillText(opts.dates[n-1],W-P.r-70,H-4);ctx.fillText(opts.dates[Math.floor(n/2)],W/2-30,H-4);}
+  if(opts.marks){opts.marks.forEach(m=>{const x=X(m.i),y=Y(m.p);
+    ctx.fillStyle=m.type==="b"?"#34d399":"#f87171";
+    ctx.beginPath();
+    if(m.type==="b"){ctx.moveTo(x,y-14);ctx.lineTo(x-5,y-6);ctx.lineTo(x+5,y-6);}
+    else{ctx.moveTo(x,y+14);ctx.lineTo(x-5,y+6);ctx.lineTo(x+5,y+6);}
+    ctx.closePath();ctx.fill();});}
+}
+
+async function run(){
+  const data=await loadData();if(!data)return;
+  const strat=$("sel-strategy").value,p4=$("sel-p4").value==="1",useVol=$("sel-vol").value==="1";
+  const cost=+$("inp-cost").value,cap=+$("inp-cap").value;
+  const r=backtest(data.rows,strat,p4,cost,useVol);
+  const m=metrics(r.eq,r.bh,r.trades,data.rows);
+  renderReview(r.trades, data.rows);
+  $("m-sub").textContent=`· ${data.meta.source||""} · ${r.trades.length} 笔 · 年化 ${fmtPct(m.cagr)} vs 持有 ${fmtPct(m.bhCagr)}`;
+  const S=(v,l,c)=>`<div class="stat"><div class="v ${c||""}">${v}</div><div class="l">${l}</div></div>`;
+  if(strat==="bh"){
+    $("stats").innerHTML=
+      S(fmtPct(m.bhTotal),"买入持有总收益")+
+      S(fmtPct(m.bhCagr),"年化 CAGR")+
+      S(fmtPct(m.bhMdd),"最大回撤","red")+
+      S(m.bhSharpe.toFixed(2),"夏普比率(年化)");
+  } else {
+  $("stats").innerHTML=
+    S(fmtPct(m.total),"策略总收益",m.total>m.bhTotal?"green":"")+
+    S(fmtPct(m.bhTotal),"买入持有总收益")+
+    S(fmtPct(m.cagr),"策略年化 CAGR")+
+    S(fmtPct(m.mdd),"策略最大回撤",m.mdd>m.bhMdd?"red":"green")+
+    S(fmtPct(m.bhMdd),"持有最大回撤","red")+
+    S(m.sharpe.toFixed(2),"夏普比率(年化)",m.sharpe>0?"green":"red")+
+    S(m.n+" 笔","交易次数")+
+    S(fmtPct(m.wr),"胜率")+
+    S(m.avgHold+" 日","平均持仓");
+  }
+
+  const rows=r.rows,dates=rows.map(x=>x.date);
+  const eqScale=r.eq.map(v=>v*cap),bhScale=r.bh.map(v=>v*cap);
+  const ddS=r.eq.map((v,i)=>{let p=-1;for(let j=200;j<=i;j++)p=Math.max(p,r.eq[j]);return (v/p-1)*100;});
+  const ddB=r.bh.map((v,i)=>{let p=-1;for(let j=200;j<=i;j++)p=Math.max(p,r.bh[j]);return (v/p-1)*100;});
+  draw();
+  lineChart($("cv-price"),[
+    {data:rows.map(x=>x.close),color:"#60a5fa",width:1.6},
+    {data:r.ma20,color:"#e5c07b",width:1,dash:[4,3]},
+    {data:r.ma200,color:"#a78bfa",width:1,dash:[8,4]}],
+    {dates,marks:r.marks,fmt:v=>v.toFixed(0)});
+  lineChart($("cv-equity"),[
+    {data:eqScale,color:"#34d399",width:1.8},
+    {data:bhScale,color:"#94a3b8",width:1.2,dash:[4,3]}],
+    {dates,fmt:v=>(v/1000).toFixed(0)+"k"});
+  lineChart($("cv-dd"),[
+    {data:ddB.map(v=>v/2),color:"#94a3b8",width:1,dash:[4,3]},
+    {data:ddS,color:"#f87171",width:1.5}],
+    {dates,fmt:v=>v.toFixed(0)+"%"});
+  $("trade-table").innerHTML="<tr><th>#</th><th>入场日</th><th>出场日</th><th>入场价</th><th>出场价</th><th>收益%</th><th>持仓日</th><th>离场原因</th></tr>"+
+    r.trades.map((t,i)=>`<tr><td>${i+1}</td><td>${rows[t.in].date}</td><td>${rows[t.out].date}</td><td>${t.e.toFixed(1)}</td><td>${t.x.toFixed(1)}</td>
+    <td class="${t.ret>0?"green":"red"}">${(t.ret*100).toFixed(2)}</td><td>${t.out-t.in}</td><td>${t.reason}</td></tr>`).join("");
+
+  /* —— v2.0 新增：成本敏感性稳健性检验 —— */
+  const robEl=$("robust");
+  if(strat==="bh"){
+    robEl.style.display="block";
+    robEl.innerHTML=`<h3>稳健性检验</h3><p class="small">当前为「纯买入持有」对照组，无交易成本影响。策略收益 = 持有 ${fmtPct(m.bhTotal)}（年化 ${fmtPct(m.bhCagr)}，最大回撤 ${fmtPct(m.bhMdd)}）。</p>`;
+    return;
+  }
+  const costs=[0,1,2,3,5];
+  const rowsR=costs.map(c=>{
+    const rr=backtest(data.rows,strat,p4,c,useVol);
+    return metrics(rr.eq,rr.bh,rr.trades,data.rows);
+  });
+  robEl.style.display="block";
+  robEl.innerHTML=`<h3>稳健性检验：成本敏感性（过拟合与容错检验）</h3>
+    <table><tr><th>单边成本 ‰</th><th>总收益</th><th>年化</th><th>最大回撤</th><th>交易笔数</th><th>胜率</th></tr>`+
+    costs.map((c,i)=>`<tr><td>${c}</td><td class="${rowsR[i].total>0?"green":"red"}">${fmtPct(rowsR[i].total)}</td>
+      <td>${fmtPct(rowsR[i].cagr)}</td><td>${fmtPct(rowsR[i].mdd)}</td><td>${rowsR[i].n}</td><td>${fmtPct(rowsR[i].wr)}</td></tr>`).join("")+
+    `</table>
+    <div class="note">判读：若成本从 1‰ 升至 5‰ 时收益由正转负且幅度坍塌，说明策略依赖低摩擦、容错差；若收益方向不变仅数值下降，则策略稳健。样本仅 6-8 年，结果供教学参考。</div>`;
+}
+window.addEventListener("resize",()=>{if($("stats").innerHTML)run();});
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+{
+  "300750": {
+    "name": "宁德时代",
+    "source": "新浪财经 CN_MarketDataService (sz300750)",
+    "rows": 1500,
+    "first": "2020-06-24",
+    "last": "2026-08-28"
+  },
+  "600030": {
+    "name": "中信证券",
+    "source": "新浪财经 CN_MarketDataService (sh600030)",
+    "rows": 1500,
+    "first": "2020-06-16",
+    "last": "2026-08-28"
+  },
+  "600036": {
+    "name": "招商银行",
+    "source": "新浪财经 CN_MarketDataService (sh600036)",
+    "rows": 1500,
+    "first": "2020-06-24",
+    "last": "2026-08-28"
+  },
+  "600519": {
+    "name": "贵州茅台",
+    "source": "新浪财经 CN_MarketDataService (sh600519)",
+    "rows": 1500,
+    "first": "2020-06-24",
+    "last": "2026-08-28"
+  },
+  "601318": {
+    "name": "中国平安",
+    "source": "新浪财经 CN_MarketDataService (sh601318)",
+    "rows": 1500,
+    "first": "2020-06-24",
+    "last": "2026-08-28"
+  },
+  "000858": {
+    "name": "五粮液",
+    "source": "新浪财经 CN_MarketDataService (sz000858)",
+    "rows": 1500,
+    "first": "2020-06-24",
+    "last": "2026-08-28"
+  },
+  "000001": {
+    "name": "平安银行",
+    "source": "新浪财经 CN_MarketDataService (sz000001)",
+    "rows": 1500,
+    "first": "2020-06-24",
+    "last": "2026-08-28"
+  },
+  "002594": {
+    "name": "比亚迪",
+    "source": "新浪财经 CN_MarketDataService (sz002594)",
+    "rows": 1500,
+    "first": "2020-06-24",
+    "last": "2026-08-28"
+  }
+}
